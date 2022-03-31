@@ -45,7 +45,7 @@ class Headers private constructor(
      */
     fun getRequestHeaders() = mutableMapOf<String, String>().also {
         for (entry in headerMap.entries) {
-            it[entry.key] = entry.value.joinToString { ";" }
+            it[entry.key] = entry.value.joinToString(";")
         }
     }
 

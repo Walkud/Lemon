@@ -51,6 +51,6 @@ class RealCallInterceptor(private val httpClient: HttpClient) : Interceptor {
             }
         }
 
-        return httpClient.execute(chain.request())
+        return httpClient.execute(newBuilder.build())
     }
 }

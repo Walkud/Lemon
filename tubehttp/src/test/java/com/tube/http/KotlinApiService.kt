@@ -1,6 +1,7 @@
 package com.tube.http
 
 import com.tube.http.bean.BaseResult
+import com.tube.http.bean.ReqBody
 import com.tube.http.bean.ServerTime
 import com.tube.http.disposer.Disposer
 
@@ -31,7 +32,12 @@ interface KotlinApiService {
     @POST("post/query")
     @Headers(["X-Token:token123456"])
     fun postQuery(
+        @Header("X-CALL-TIME") callTime: Long,
+        @HeaderMap headers: Map<String, Any>,
         @FieldMap params: Map<String, Any>
     ): Disposer<BaseResult<List<Item>>>
+
+    @POST("post/body")
+    fun postBody(@Body reqBody: ReqBody): Disposer<BaseResult<Void>>
 
 }

@@ -1,6 +1,7 @@
 package com.tube.http
 
 import com.tube.http.bean.BaseResult
+import com.tube.http.bean.ReqBody
 import com.tube.http.bean.ServerTime
 import com.tube.http.client.TubeClient
 import com.tube.http.disposer.Accepter
@@ -148,7 +149,15 @@ class KotlinUnitTest {
     fun testPostQuery() {
         val httpService = tubeHttp.create<KotlinApiService>()
 //        httpService.postQuery("testType",1,10)
-        httpService.postQuery(mapOf("type" to "testType", "page" to 1, "pageSize" to 10))
+        val callTime = System.currentTimeMillis()
+        httpService.postQuery(
+            callTime,
+            mapOf(
+                "X-SDK-VERSION-NAME" to BuildConfig.VERSION_NAME,
+                "X-SDK-VERSION-CODE" to BuildConfig.VERSION_CODE,
+            ),
+            mapOf("type" to "testType", "page" to 1, "pageSize" to 10)
+        )
             .subscribe(object : SampleAccepter<BaseResult<List<Item>>>() {
                 override fun call(result: BaseResult<List<Item>>) {
                     if (result.isSuccess()) {
@@ -170,6 +179,21 @@ class KotlinUnitTest {
                     throwable.printStackTrace()
                 }
 
+            })
+    }
+
+    @Test
+    fun testPostBody() {
+        val httpService = tubeHttp.create<KotlinApiService>()
+        httpService.postBody(ReqBody(1, "call data info"))
+            .subscribe(object : SampleAccepter<BaseResult<Void>>() {
+                override fun call(result: BaseResult<Void>) {
+                    if (result.isSuccess()) {
+                        println("postBody Sccuess")
+                    } else {
+                        println("postBody Fail")
+                    }
+                }
             })
     }
 }

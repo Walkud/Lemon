@@ -133,10 +133,10 @@ class TubeClient private constructor(
     /**
      * 添加请求头参数
      */
-    private fun addHeaderPropertys(httpConection: HttpURLConnection, request: Request) {
+    private fun addHeaderPropertys(conection: HttpURLConnection, request: Request) {
         val requestHeaders = request.headers.getRequestHeaders()
         for (entry in requestHeaders.entries) {
-            httpConection.addRequestProperty(entry.key, entry.value)
+            conection.setRequestProperty(entry.key, entry.value)
         }
     }
 

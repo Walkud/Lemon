@@ -33,6 +33,7 @@ dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 //    compileOnly 'androidx.core:core-ktx:1.7.0'
     compileOnly 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1'
+    testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.google.code.gson:gson:2.8.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
