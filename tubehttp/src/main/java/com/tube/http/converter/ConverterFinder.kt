@@ -107,9 +107,9 @@ class ConverterFinder private constructor(private val converterFactors: List<Con
                     }
                 }
             } else if (type === RequestBody::class.java) {
-                return object : Converter<Any, RequestBody> {
-                    override fun convert(value: Any): RequestBody {
-                        return value as RequestBody
+                return object : Converter<RequestBody, RequestBody> {
+                    override fun convert(value: RequestBody): RequestBody {
+                        return value
                     }
                 }
             }
