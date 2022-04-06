@@ -3,7 +3,11 @@ package com.tube.http
 import com.tube.http.disposer.Disposer
 import com.tube.http.disposer.impl.CreateDisposer
 import com.tube.http.request.body.FormBody
+import com.tube.http.request.body.MultipartBody
+import com.tube.http.request.body.RequestBody
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.InputStream
 import java.io.OutputStream
 import java.lang.StringBuilder
 import java.lang.reflect.Method
@@ -153,6 +157,13 @@ internal fun FormBody.convertToQuery(): String {
  * 尝试关闭输出流
  */
 internal fun OutputStream.tryClose() {
+    try {
+        close()
+    } catch (t: Throwable) {
+    }
+}
+
+internal fun InputStream.tryClose() {
     try {
         close()
     } catch (t: Throwable) {

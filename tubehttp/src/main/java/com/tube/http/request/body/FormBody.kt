@@ -6,10 +6,10 @@ import java.io.OutputStream
 import java.net.URLEncoder
 
 /**
- * Describe:
+ * Describe:表单请求 Body
  * Created by liya.zhu on 2022/3/7
  */
-class FormBody(private val encodedNames: List<String>, private val encodedValues: List<String>) :
+class FormBody(val encodedNames: List<String>, val encodedValues: List<String>) :
     RequestBody() {
 
     override fun contentType() = ContentType.FROM

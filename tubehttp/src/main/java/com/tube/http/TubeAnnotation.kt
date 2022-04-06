@@ -75,6 +75,13 @@ annotation class POST(
 annotation class Headers(val value: Array<String>)
 
 /**
+ * 多部件请求体注解，该注解用于方法函数上，用于请求体包括普通参数和文件场景，使用该注解后，消息体会使用 MultipartBody 进行参数组装。
+ */
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class Multipart()
+
+/**
  * 数据对象序列化转换注解，该注解会被 Converter 进行序列化转换。
  * 场景：例如可用于 Json 数据上报场景，Converter 可参考测试用例代码 GsonConverterFactory
  */
@@ -145,4 +152,30 @@ annotation class HeaderMap
 annotation class Path(
     val value: String,
     val encoded: Boolean = false
+)
+
+/**
+ * 请求体部件注解，用于标识该参数为请求体部件
+ *
+ * @param value 部件名称,默认为空串，参数类型为 Part 时，可以不设置
+ * @param encoding 部件内容传输编码，默认为二进制，参数类型为 Part 时，设置无效
+ *
+ */
+@Target(AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class Part(
+    val value: String = "",
+    val encoding: String = "binary"
+)
+
+/**
+ * 请求体多部件注解，用于标识多个参数请求体部件，仅支持 File 和 ReuqstBody 类型
+ *
+ * @param encoding 部件内容传输编码，默认为二进制
+ *
+ */
+@Target(AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class PartMap(
+    val encoding: String = "binary"
 )

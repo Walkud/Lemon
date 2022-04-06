@@ -6,7 +6,9 @@ import com.tube.http.isGetMethod
 import com.tube.http.isHttpProtocol
 import com.tube.http.isPostMethod
 import com.tube.http.request.body.FormBody
+import com.tube.http.request.body.MultipartBody
 import com.tube.http.request.body.RequestBody
+import java.io.File
 import java.lang.reflect.Method
 import java.net.URLEncoder
 import java.util.regex.Pattern
@@ -23,6 +25,7 @@ class Request private constructor(
     val serviceUrlPath: String,
     val urlPath: String,
     val headers: Headers,
+    val isMultipart: Boolean,
     val body: RequestBody?
 ) {
     /**
@@ -71,6 +74,7 @@ class Request private constructor(
             serviceUrlPath,
             urlPath,
             headers.newBuilder(),
+            isMultipart,
             body
         )
     }
@@ -83,10 +87,12 @@ class Request private constructor(
         private val serviceUrlPath: String,
         private var urlPath: String,
         private val headersBuilder: Headers.Builder,
+        private val isMultipart: Boolean,
         private var body: RequestBody? = null
     ) {
 
         private var formBuilder: FormBody.Builder? = null
+        private var multipartBuilder: MultipartBody.Builder? = null
 
         companion object {
             private val PATH_TRAVERSAL = Pattern.compile("(.*/)?(\\.|%2e|%2E){1,2}(/.*)?")
@@ -130,6 +136,22 @@ class Request private constructor(
         }
 
         /**
+         * 添加文件部件
+         */
+        fun addPart(name: String, encoding: String, part: Any) {
+            if (multipartBuilder == null) {
+                multipartBuilder = MultipartBody.Builder()
+            }
+
+            when (part) {
+                is MultipartBody.Part -> multipartBuilder?.addPart(part)
+                is File -> multipartBuilder?.addPart(name, encoding, part)
+                is RequestBody -> multipartBuilder?.addPart(name, encoding, part)
+                else -> multipartBuilder?.addPart(name, encoding, part.toString())
+            }
+        }
+
+        /**
          * 设置请求消息体
          */
         fun setBody(body: RequestBody?) = apply { this.body = body }
@@ -137,10 +159,16 @@ class Request private constructor(
         fun build(): Request {
 
             if (body == null) {
-                if (formBuilder != null) {
-                    body = formBuilder!!.build()
-                } else if (httpMethod.isPostMethod()) {
-                    body = RequestBody.EMPTY_BODY
+                when {
+                    formBuilder != null -> {
+                        body = formBuilder!!.build()
+                    }
+                    multipartBuilder != null -> {
+                        body = multipartBuilder!!.build()
+                    }
+                    httpMethod.isPostMethod() -> {
+                        body = RequestBody.EMPTY_BODY
+                    }
                 }
             }
 
@@ -152,6 +180,7 @@ class Request private constructor(
                 serviceUrlPath,
                 urlPath,
                 headersBuilder.build(),
+                isMultipart,
                 body
             )
         }

@@ -1,7 +1,8 @@
 package com.tube.http.request.body
 
 import com.tube.http.request.ContentType
-import java.io.OutputStream
+import com.tube.http.tryClose
+import java.io.*
 
 /**
  * Describe: 请求消息体，参考 OkHttp RequestBody
@@ -35,6 +36,22 @@ abstract class RequestBody {
 
                 override fun contentLength(): Long {
                     return content.size.toLong()
+                }
+            }
+        }
+
+        fun create(contentType: ContentType?, file: File): RequestBody {
+            return object : RequestBody() {
+                override fun contentType() = contentType
+
+                override fun writeTo(outputStream: OutputStream) {
+                    val inputStream = FileInputStream(file)
+                    outputStream.write(inputStream.readBytes())
+                    inputStream.tryClose()
+                }
+
+                override fun contentLength(): Long {
+                    return file.length()
                 }
             }
         }

@@ -53,7 +53,7 @@ interface ParameterHandler<in T> {
     class Field(
         private val index: Int,
         private val method: Method,
-        var name: String,
+        private val name: String,
         private val encoded: Boolean
     ) : ParameterHandler<Any> {
 
@@ -100,7 +100,7 @@ interface ParameterHandler<in T> {
     class Header(
         private val index: Int,
         private val method: Method,
-        var name: String,
+        private val name: String,
     ) : ParameterHandler<Any> {
         override fun apply(builder: Request.Builder, value: Any?) {
             value?.let {
@@ -143,7 +143,7 @@ interface ParameterHandler<in T> {
     class Path(
         private val index: Int,
         private val method: Method,
-        var name: String,
+        private val name: String,
         private val encoded: Boolean
     ) : ParameterHandler<Any> {
         override fun apply(builder: Request.Builder, value: Any?) {
@@ -153,6 +153,39 @@ interface ParameterHandler<in T> {
                 "Path $name value must not be null!"
             )
             builder.addPathParam(name, path.toString(), encoded)
+        }
+    }
+
+    class Part(
+        private val index: Int,
+        private val method: Method,
+        private val name: String,
+        private val encoding: String
+    ) : ParameterHandler<Any> {
+        override fun apply(builder: Request.Builder, value: Any?) {
+            value?.let { part ->
+                builder.addPart(name, encoding, part)
+            }
+        }
+    }
+
+    class PartMap(
+        private val index: Int,
+        private val method: Method,
+        private val encoding: String
+    ) : ParameterHandler<Map<String, Any?>> {
+        override fun apply(builder: Request.Builder, value: Map<String, Any?>?) {
+            if (value != null) {
+                for (entry in value.entries) {
+                    val name = entry.key
+                    val partValue = entry.value
+                    partValue?.let { part ->
+                        builder.addPart(name, encoding, part)
+                    }
+                }
+            } else {
+                TubeUtils.parameterError(index, method, "PartMap value must not be null!")
+            }
         }
     }
 }

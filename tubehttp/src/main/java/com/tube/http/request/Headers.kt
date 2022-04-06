@@ -1,7 +1,5 @@
 package com.tube.http.request
 
-import com.tube.http.TubeUtils
-
 /**
  * Describe: 请求头
  * Created by liya.zhu on 2022/3/16

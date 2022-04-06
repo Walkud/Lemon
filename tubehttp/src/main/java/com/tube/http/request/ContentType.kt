@@ -31,6 +31,9 @@ class ContentType(
         val JSON by lazy {
             parse("application/json; charset=UTF-8")
         }
+        val MULTIPART_FORM_DATA by lazy {
+            parse("multipart/form-data")
+        }
 
         /**
          * 通过正则表达式解析 Content-Type

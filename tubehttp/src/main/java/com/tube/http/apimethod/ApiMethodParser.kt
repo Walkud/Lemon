@@ -9,7 +9,6 @@ import com.tube.http.request.body.RequestBody
 import com.tube.http.request.body.ResponseBody
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
 
 /**
  * Describe: Api 接口与目标方法解析器
@@ -30,6 +29,7 @@ class ApiMethodParser(
     private var httpMethod = ""
     private val headersBuilder = com.tube.http.request.Headers.Builder()
     private val parameterHandlers = mutableListOf<ParameterHandler<*>>()
+    private var isMultipart = false
     var responseConverter: Converter<ResponseBody, *>
         private set
 
@@ -58,6 +58,7 @@ class ApiMethodParser(
                 serviceUrlPath,
                 urlPath,
                 headersBuilder,
+                isMultipart,
             )
 
         val handlers = parameterHandlers as MutableList<ParameterHandler<Any>>
@@ -90,15 +91,10 @@ class ApiMethodParser(
         val methodAnnotations = originMethod.annotations
         for (annotation in methodAnnotations) {
             when (annotation) {
-                is GET -> {
-                    parseHttpMethod("GET", annotation, annotation.value)
-                }
-                is POST -> {
-                    parseHttpMethod("POST", annotation, annotation.value)
-                }
-                is Headers -> {
-                    parseMethodHeader(annotation, annotation.value)
-                }
+                is GET -> parseHttpMethod("GET", annotation, annotation.value)
+                is POST -> parseHttpMethod("POST", annotation, annotation.value)
+                is Headers -> parseMethodHeader(annotation, annotation.value)
+                is Multipart -> isMultipart = true
             }
         }
     }
@@ -224,6 +220,37 @@ class ApiMethodParser(
                     val name = annotation.value
                     val encoded = annotation.encoded
                     ParameterHandler.Path(index, originMethod, name, encoded)
+                }
+                is Part -> {
+                    val rawType = type.asRawType()
+                    if (rawType.isInvalidParameterType()) {
+                        throw  IllegalArgumentException(
+                            "@Part parameter type is invalid!" +
+                                    "for method:${originMethod.referenceName()},typeName:$type"
+                        )
+                    }
+
+                    val name = annotation.value
+                    val encoding = annotation.encoding
+                    ParameterHandler.Part(index, originMethod, name, encoding)
+                }
+                is PartMap -> {
+                    if (type.isNotMapParameterizedType()) {
+                        throw  IllegalArgumentException(
+                            "@PartMap parameter type must be Map!" +
+                                    "for method:${originMethod.referenceName()},typeName:$type"
+                        )
+                    }
+
+                    if (type.isInvalidGenericParameterType()) {
+                        throw  IllegalArgumentException(
+                            "@PartMap Map generic types must be defined (e.g., Map<String, File>)!" +
+                                    "for method:${originMethod.referenceName()},typeName:$type"
+                        )
+                    }
+
+                    val encoding = annotation.encoding
+                    ParameterHandler.PartMap(index, originMethod, encoding)
                 }
                 else -> {
                     null
