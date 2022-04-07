@@ -12,10 +12,22 @@ import com.tube.http.disposer.transformer.WarpTransformer
  */
 abstract class Disposer<T> {
 
+    companion object {
+        /**
+         * 创建 Disposer
+         */
+        fun <T> create(value: T) = CreateDisposer(value)
+    }
+
     /**
      * 事件接收器传递
      */
     internal abstract fun transmit(accepter: Accepter<T>)
+
+    /**
+     * 仅传递 Call 事件，在 Convert 场景会被调用
+     */
+    internal abstract fun onlyCall(): Disposer<T>
 
     /**
      * 事件包裹，用于事件处理扩展
@@ -51,12 +63,5 @@ abstract class Disposer<T> {
      */
     fun subscribe(accepter: Accepter<T>) {
         transmit(accepter)
-    }
-
-    companion object {
-        /**
-         * 创建 Disposer
-         */
-        fun <T> create(value: T) = CreateDisposer(value)
     }
 }

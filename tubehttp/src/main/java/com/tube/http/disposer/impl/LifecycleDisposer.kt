@@ -16,6 +16,8 @@ class LifecycleDisposer<T>(
         disposer.transmit(LifecycleAccepter(accepter, action))
     }
 
+    override fun onlyCall() = apply { disposer.onlyCall() }
+
     /**
      * 生命周期事件接收器，用于分发 doStart、doEnd、doError 事件
      */

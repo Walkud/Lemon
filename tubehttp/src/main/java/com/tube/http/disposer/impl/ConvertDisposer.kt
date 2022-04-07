@@ -18,6 +18,8 @@ class ConvertDisposer<T, R>(
         disposer.transmit(ConvertAccepter(accepter, transformer))
     }
 
+    override fun onlyCall() = apply { disposer.onlyCall() }
+
     /**
      * 事件转换接收器
      * 1、接收到事件 T
