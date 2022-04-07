@@ -1,6 +1,5 @@
 package com.tube.http.apimethod
 
-import android.text.TextUtils
 import com.tube.http.*
 import com.tube.http.apimethod.parameter.ParameterHandler
 import com.tube.http.converter.Converter
