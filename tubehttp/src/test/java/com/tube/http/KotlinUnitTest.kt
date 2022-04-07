@@ -10,7 +10,10 @@ import com.tube.http.disposer.transformer.ConvertTransformer
 import com.tube.http.disposer.transformer.WarpTransformer
 import com.tube.http.interceptor.Interceptor
 import com.tube.http.request.Response
+import com.tube.http.request.body.MultipartBody
+import com.tube.http.request.body.RequestBody
 import org.junit.Test
+import java.io.File
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -195,5 +198,40 @@ class KotlinUnitTest {
                     }
                 }
             })
+    }
+
+    @Test
+    fun testPostPartBody() {
+        val httpService = tubeHttp.create<KotlinApiService>()
+        val file = File("/Users/liya.zhu-mac/Documents/Android/workspace/my/TubeHttp/README.md")
+        val part = MultipartBody.Part.create(
+            name = "part",
+            requestBody = RequestBody.Companion.create("Part Content!")
+        )
+        val contentRequestBody = RequestBody.create("RequestBody Content!")
+
+        val mapPart = MultipartBody.Part.create(
+            name = "mapPart",
+            requestBody = RequestBody.Companion.create("Map Part Content!")
+        )
+
+        val partMap = mapOf(
+            "mapMsg" to "Map Msg Content!",
+            "mapFile" to file,
+            "mapPart" to mapPart,
+            "mapRequestBody" to RequestBody.Companion.create(" Map Part Content!")
+        )
+
+        httpService.postPartBody("Part msg!", file, part, contentRequestBody, partMap)
+            .subscribe(object : SampleAccepter<BaseResult<Void>>() {
+                override fun call(result: BaseResult<Void>) {
+                    if (result.isSuccess()) {
+                        println("postPartBody code:${result.code},msg:${result.msg}")
+                    } else {
+                        print("serverError:${result.msg}")
+                    }
+                }
+            })
+
     }
 }

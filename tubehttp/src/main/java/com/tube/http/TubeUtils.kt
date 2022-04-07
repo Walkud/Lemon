@@ -4,6 +4,7 @@ import java.lang.reflect.*
 import java.security.GeneralSecurityException
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
+import java.util.*
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSocketFactory
@@ -19,6 +20,13 @@ internal class TubeUtils private constructor() {
 
         val userAgent by lazy {
             "TubeHttp/${BuildConfig.VERSION_NAME}"
+        }
+
+        /**
+         * 获取 32 位移除分隔符的随机UUID
+         */
+        fun getRandomUUID32(): String {
+            return UUID.randomUUID().toString().replace("-", "")
         }
 
         /**

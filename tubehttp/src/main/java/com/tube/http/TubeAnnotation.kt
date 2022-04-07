@@ -79,7 +79,7 @@ annotation class Headers(val value: Array<String>)
  */
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Multipart()
+annotation class Multipart
 
 /**
  * 数据对象序列化转换注解，该注解会被 Converter 进行序列化转换。
@@ -157,9 +157,13 @@ annotation class Path(
 /**
  * 请求体部件注解，用于标识该参数为请求体部件
  *
- * @param value 部件名称,默认为空串，参数类型为 Part 时，可以不设置
+ * @param value 部件名称,默认为空串，参数类型为 Part 时，设置无效
  * @param encoding 部件内容传输编码，默认为二进制，参数类型为 Part 时，设置无效
  *
+ * 示例：fun xxx(@Part part:Part 或 @PartMap("fileKey") file:File )
+ *
+ * 注意：Map value 的参数类型支持 File 、ReuqstBody 、MultipartBody.Part 、String类型，
+ * 其它类型会转换成 String，请自实现 toString 方法
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
@@ -169,10 +173,14 @@ annotation class Part(
 )
 
 /**
- * 请求体多部件注解，用于标识多个参数请求体部件，仅支持 File 和 ReuqstBody 类型
+ * 请求体多部件注解，用于标识多个参数请求体部件
  *
  * @param encoding 部件内容传输编码，默认为二进制
  *
+ * 示例：fun xxx(@PartMap partMap:Map<String,File> 或 @PartMap partMap:Map<String,Any> )
+ *
+ * 注意：Map key 必须为 String，值为部件名称, Map value 的参数类型支持 File 、ReuqstBody 、MultipartBody.Part 、String类型，
+ * 其它类型会转换成 String，请自实现 toString 方法
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)

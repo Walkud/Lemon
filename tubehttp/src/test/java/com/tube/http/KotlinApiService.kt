@@ -4,6 +4,9 @@ import com.tube.http.bean.BaseResult
 import com.tube.http.bean.ReqBody
 import com.tube.http.bean.ServerTime
 import com.tube.http.disposer.Disposer
+import com.tube.http.request.body.MultipartBody
+import com.tube.http.request.body.RequestBody
+import java.io.File
 
 /**
  * Describe:
@@ -39,5 +42,14 @@ interface KotlinApiService {
 
     @POST("post/body")
     fun postBody(@Body reqBody: ReqBody): Disposer<BaseResult<Void>>
+
+    @POST("post/part")
+    fun postPartBody(
+        @Part("msg") msg: String,
+        @Part("partFile") singleFile: File,
+        @Part("part") part: MultipartBody.Part,
+        @Part("contentRequestBody") contentRequestBody: RequestBody,
+        @PartMap partMap: Map<String, Any>
+    ): Disposer<BaseResult<Void>>
 
 }

@@ -83,6 +83,11 @@ internal fun Class<*>.isValidParameterType() =
     this.isPrimitive || Any::class.java.isAssignableFrom(this)
 
 /**
+ * 是否为 MultipartBody.Part 类型
+ */
+internal fun Class<*>.isPartType() = MultipartBody.Part::class.java.isAssignableFrom(this)
+
+/**
  * 检测是否不为无效泛型类型，有效：例如 <String,String> 、<String,Any> 等
  */
 internal fun Type.isInvalidGenericParameterType() = !isValidGenericParameterType()
@@ -163,18 +168,12 @@ internal fun OutputStream.tryClose() {
     }
 }
 
+/**
+ * 尝试关闭输入流
+ */
 internal fun InputStream.tryClose() {
     try {
         close()
     } catch (t: Throwable) {
-    }
-}
-
-/**
- * 调用 CreateDisposer onlyCall 函数
- */
-internal fun <T> Disposer<T>.onlyCall() = apply {
-    if (this is CreateDisposer) {
-        this.onlyCall()
     }
 }

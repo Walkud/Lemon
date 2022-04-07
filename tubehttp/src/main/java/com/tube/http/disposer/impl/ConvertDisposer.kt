@@ -3,7 +3,6 @@ package com.tube.http.disposer.impl
 import com.tube.http.disposer.Accepter
 import com.tube.http.disposer.Disposer
 import com.tube.http.disposer.transformer.ConvertTransformer
-import com.tube.http.onlyCall
 
 /**
  * Describe:事件转换处理器

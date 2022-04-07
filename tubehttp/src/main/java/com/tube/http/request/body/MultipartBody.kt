@@ -1,9 +1,10 @@
 package com.tube.http.request.body
 
+import com.tube.http.TubeUtils
 import com.tube.http.request.ContentType
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.OutputStream
-import java.util.*
 
 /**
  * Describe:多部件请求 Body
@@ -18,6 +19,12 @@ class MultipartBody private constructor(
     companion object {
         private val CRLF = "\r\n".toByteArray()
         private val DASH = "--".toByteArray()
+    }
+
+    override fun contentLength(): Long {
+        val byteOpt = ByteArrayOutputStream()
+        writeTo(byteOpt)
+        return byteOpt.size().toLong()
     }
 
     override fun contentType() = ContentType.MULTIPART_FORM_DATA
@@ -40,8 +47,9 @@ class MultipartBody private constructor(
             outputStream.write(CRLF)
 
             part.encoding?.let { encoding ->
-                val transferEncoding = "Content-Transfer-Encoding:$encoding;"
+                val transferEncoding = "Content-Transfer-Encoding:$encoding"
                 outputStream.write(transferEncoding.toByteArray())
+                outputStream.write(CRLF)
             }
 
             body.contentType()?.let { contentType ->
@@ -66,7 +74,7 @@ class MultipartBody private constructor(
         outputStream.write(CRLF)
     }
 
-    class Builder(private val boundary: String = UUID.randomUUID().toString()) {
+    class Builder(private val boundary: String = TubeUtils.getRandomUUID32()) {
 
         private val parts = mutableListOf<Part>()
 

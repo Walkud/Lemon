@@ -1,5 +1,6 @@
 package com.tube.http.apimethod
 
+import android.text.TextUtils
 import com.tube.http.*
 import com.tube.http.apimethod.parameter.ParameterHandler
 import com.tube.http.converter.Converter
@@ -103,8 +104,15 @@ class ApiMethodParser(
      * 解析请求方法类型
      */
     private fun parseHttpMethod(httpMethod: String, annotation: Annotation, value: String) {
-        this.httpMethod = httpMethod
-        this.urlPath = value
+        if (TextUtils.isEmpty(httpMethod)) {
+            this.httpMethod = httpMethod
+            this.urlPath = value
+        } else {
+            throw  IllegalArgumentException(
+                "Only one Http Method annotation can be used!" +
+                        "for method:${originMethod.referenceName()}"
+            )
+        }
     }
 
     /**
@@ -222,6 +230,20 @@ class ApiMethodParser(
                     ParameterHandler.Path(index, originMethod, name, encoded)
                 }
                 is Part -> {
+                    if (!isMultipart) {
+                        throw  IllegalArgumentException(
+                            "@Part annotation must be used with the @Multipart annotation！" +
+                                    "for method:${originMethod.referenceName()},typeName:$type"
+                        )
+                    }
+
+                    if (type.isMapParameterizedType()) {
+                        throw  IllegalArgumentException(
+                            "@Part parameter does not support Map type.Use the @partMap annotation!" +
+                                    "for method:${originMethod.referenceName()},typeName:$type"
+                        )
+                    }
+
                     val rawType = type.asRawType()
                     if (rawType.isInvalidParameterType()) {
                         throw  IllegalArgumentException(
@@ -231,10 +253,24 @@ class ApiMethodParser(
                     }
 
                     val name = annotation.value
+                    if (name.isEmpty() && !rawType.isPartType()) {
+                        throw  IllegalArgumentException(
+                            "@Part value is empty, the parameter type must be MultipartBody.Part!" +
+                                    "for method:${originMethod.referenceName()},typeName:$type"
+                        )
+                    }
+
                     val encoding = annotation.encoding
                     ParameterHandler.Part(index, originMethod, name, encoding)
                 }
                 is PartMap -> {
+                    if (!isMultipart) {
+                        throw  IllegalArgumentException(
+                            "@PartMap annotation must be used with the @Multipart annotation！" +
+                                    "for method:${originMethod.referenceName()},typeName:$type"
+                        )
+                    }
+
                     if (type.isNotMapParameterizedType()) {
                         throw  IllegalArgumentException(
                             "@PartMap parameter type must be Map!" +
