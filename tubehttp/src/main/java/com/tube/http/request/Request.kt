@@ -99,6 +99,11 @@ class Request private constructor(
         }
 
         /**
+         * 设置请求头参数
+         */
+        fun setHeader(key: String, value: String) = apply { headersBuilder.set(key, value) }
+
+        /**
          * 添加请求头参数
          */
         fun addHeader(key: String, value: String) = apply { headersBuilder.add(key, value) }

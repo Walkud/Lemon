@@ -21,32 +21,32 @@ class RealCallInterceptor(private val httpClient: HttpClient) : Interceptor {
 
         val userAgent = headers.get(Headers.USER_AGENT_KEY)
         if (userAgent == null) {
-            newBuilder.addHeader(Headers.USER_AGENT_KEY, TubeUtils.userAgent)
+            newBuilder.setHeader(Headers.USER_AGENT_KEY, TubeUtils.userAgent)
         }
 
         val host = headers.get(Headers.HOST_KEY)
         if (host == null) {
             val url = request.url.toURL()
-            newBuilder.addHeader(Headers.HOST_KEY, "${url.host}:${url.port}")
+            newBuilder.setHeader(Headers.HOST_KEY, "${url.host}:${url.port}")
         }
 
         val connection = headers.get(Headers.CONNECTION_KEY)
         if (connection == null) {
-            newBuilder.addHeader(Headers.CONNECTION_KEY, "Keep-Alive")
+            newBuilder.setHeader(Headers.CONNECTION_KEY, "Keep-Alive")
         }
 
         request.body?.let { body ->
             val contentType = body.contentType()
             contentType?.let {
-                newBuilder.addHeader(Headers.CONTENT_TYPE_KEY, it.value)
+                newBuilder.setHeader(Headers.CONTENT_TYPE_KEY, it.value)
             }
 
             val contentLength = body.contentLength()
             if (contentLength != -1L) {
-                newBuilder.addHeader(Headers.CONTENT_LENGTH_KEY, "$contentLength")
+                newBuilder.setHeader(Headers.CONTENT_LENGTH_KEY, "$contentLength")
                 newBuilder.removeHeader(Headers.TRANSFER_ENCODING_KEY)
             } else {
-                newBuilder.addHeader(Headers.TRANSFER_ENCODING_KEY, "chunked")
+                newBuilder.setHeader(Headers.TRANSFER_ENCODING_KEY, "chunked")
                 newBuilder.removeHeader(Headers.CONTENT_LENGTH_KEY)
             }
         }
