@@ -1,5 +1,6 @@
 package com.tube.http.request
 
+import com.tube.http.request.body.MultipartBody
 import java.nio.charset.Charset
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -19,8 +20,9 @@ class ContentType(
 ) {
 
     companion object {
+        private const val SEMICOLON_DASH = ";"
         private const val REG_TYPE = "([a-zA-Z0-9-!#$%&'*+.^_`{|}~]+)"
-        private const val REG_PARAMETER = ";\\s*(?:$REG_TYPE=($REG_TYPE))?"
+        private const val REG_PARAMETER = "$SEMICOLON_DASH\\s*(?:$REG_TYPE=($REG_TYPE))?"
 
         private val TYPE_PATTERN = Pattern.compile("$REG_TYPE/$REG_TYPE")
         private val PARAMETER_PARTTERN = Pattern.compile(REG_PARAMETER)
@@ -74,5 +76,14 @@ class ContentType(
         } catch (e: Exception) {
             defaultCharset
         }
+    }
+
+    fun addParameter(attribute: String, parameterValue: String): ContentType {
+        var dash = ""
+        if (!parameterValue.endsWith(SEMICOLON_DASH) && !attribute.startsWith(SEMICOLON_DASH)) {
+            dash = SEMICOLON_DASH
+        }
+
+        return parse("${value}$dash$attribute=$parameterValue")
     }
 }

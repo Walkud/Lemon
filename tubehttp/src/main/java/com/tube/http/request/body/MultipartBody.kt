@@ -27,7 +27,8 @@ class MultipartBody private constructor(
         return byteOpt.size().toLong()
     }
 
-    override fun contentType() = ContentType.MULTIPART_FORM_DATA
+    override fun contentType() =
+        ContentType.MULTIPART_FORM_DATA.addParameter("boundary", "${String(DASH)}$boundary")
 
     override fun writeTo(outputStream: OutputStream) {
 
