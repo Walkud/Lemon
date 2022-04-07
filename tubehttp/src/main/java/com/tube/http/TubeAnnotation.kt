@@ -157,13 +157,12 @@ annotation class Path(
 /**
  * 请求体部件注解，用于标识该参数为请求体部件
  *
- * @param value 部件名称,默认为空串，参数类型为 Part 时，设置无效
- * @param encoding 部件内容传输编码，默认为二进制，参数类型为 Part 时，设置无效
+ * @param value 部件名称,默认为空串，参数类型为 MultipartBody.Part 时，设置无效
+ * @param encoding 部件内容传输编码，默认为二进制，参数类型为 MultipartBody.Part 时，设置无效
  *
  * 示例：fun xxx(@Part part:Part 或 @PartMap("fileKey") file:File )
  *
- * 注意：Map value 的参数类型支持 File 、ReuqstBody 、MultipartBody.Part 、String类型，
- * 其它类型会转换成 String，请自实现 toString 方法
+ * 注意：参数类型支持 File 、ReuqstBody 、MultipartBody.Part 、String 类型，其它类型会转换成 String，请自实现 toString 方法
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
@@ -179,7 +178,7 @@ annotation class Part(
  *
  * 示例：fun xxx(@PartMap partMap:Map<String,File> 或 @PartMap partMap:Map<String,Any> )
  *
- * 注意：Map key 必须为 String，值为部件名称, Map value 的参数类型支持 File 、ReuqstBody 、MultipartBody.Part 、String类型，
+ * 注意：Map key 必须为 String，值为部件名称, Map value 的参数类型支持 File 、ReuqstBody 、MultipartBody.Part 、String 类型，
  * 其它类型会转换成 String，请自实现 toString 方法
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)

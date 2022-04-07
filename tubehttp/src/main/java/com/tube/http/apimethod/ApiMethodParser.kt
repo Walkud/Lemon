@@ -78,7 +78,14 @@ class ApiMethodParser(
         for (annotation in classAnnotations) {
             when (annotation) {
                 is BaseUrl -> {
-                    serviceUrlPath = annotation.value
+                    if (serviceUrlPath.isEmpty()) {
+                        serviceUrlPath = annotation.value
+                    } else {
+                        throw  IllegalArgumentException(
+                            "Only one @BaseUrl annotation can be used!" +
+                                    "for class:${originService.name}"
+                        )
+                    }
                 }
             }
         }
@@ -104,7 +111,7 @@ class ApiMethodParser(
      * 解析请求方法类型
      */
     private fun parseHttpMethod(httpMethod: String, annotation: Annotation, value: String) {
-        if (TextUtils.isEmpty(httpMethod)) {
+        if (this.httpMethod.isEmpty()) {
             this.httpMethod = httpMethod
             this.urlPath = value
         } else {
