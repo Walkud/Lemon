@@ -13,8 +13,7 @@ import java.io.OutputStream
 class MultipartBody private constructor(
     val boundary: String,
     val parts: List<Part>
-) :
-    RequestBody() {
+) : RequestBody() {
 
     private val contentType by lazy {
         ContentType.MULTIPART_FORM_DATA.addParameter("boundary", boundary)
@@ -25,10 +24,11 @@ class MultipartBody private constructor(
         private val DASH = "--".toByteArray()
     }
 
-    override fun contentLength(): Long {
-        val byteOpt = ByteArrayOutputStream()
-        writeTo(byteOpt)
-        return byteOpt.size().toLong()
+    override fun measureContentLength(): Long {
+        return ByteArrayOutputStream().let {
+            writeTo(it)
+            it.size().toLong()
+        }
     }
 
     override fun contentType() = contentType

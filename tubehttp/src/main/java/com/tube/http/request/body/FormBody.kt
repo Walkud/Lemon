@@ -14,10 +14,11 @@ class FormBody(val encodedNames: List<String>, val encodedValues: List<String>) 
 
     override fun contentType() = ContentType.FROM
 
-    override fun contentLength(): Long {
-        val byteOpt = ByteArrayOutputStream()
-        writeTo(byteOpt)
-        return byteOpt.size().toLong()
+    override fun measureContentLength(): Long {
+        return ByteArrayOutputStream().let {
+            writeTo(it)
+            it.size().toLong()
+        }
     }
 
     override fun writeTo(outputStream: OutputStream) {

@@ -33,7 +33,7 @@ abstract class RequestBody {
                     outputStream.write(content, offset, content.size)
                 }
 
-                override fun contentLength(): Long {
+                override fun measureContentLength(): Long {
                     return content.size.toLong()
                 }
             }
@@ -49,17 +49,25 @@ abstract class RequestBody {
                     inputStream.tryClose()
                 }
 
-                override fun contentLength(): Long {
-                    return file.length()
-                }
+                override fun measureContentLength() = file.length()
+
             }
         }
     }
+
+    private var contentLength = -1L
 
     abstract fun contentType(): ContentType?
 
     abstract fun writeTo(outputStream: OutputStream)
 
-    open fun contentLength() = -1L
+    abstract fun measureContentLength(): Long
+
+    fun contentLength(): Long {
+        if (contentLength == -1L) {
+            contentLength = measureContentLength()
+        }
+        return contentLength
+    }
 
 }
