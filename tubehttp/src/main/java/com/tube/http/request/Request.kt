@@ -150,7 +150,7 @@ class Request private constructor(
 
             when (part) {
                 is MultipartBody.Part -> multipartBuilder?.addPart(part)
-                is File -> multipartBuilder?.addPart(name, encoding, part)
+                is File -> multipartBuilder?.addPart(name, encoding, file = part)
                 is RequestBody -> multipartBuilder?.addPart(name, encoding, part)
                 else -> multipartBuilder?.addPart(name, encoding, part.toString())
             }

@@ -25,7 +25,7 @@ abstract class RequestBody {
         fun create(content: ByteArray, contentType: ContentType? = null) =
             create(content, contentType, 0)
 
-        fun create(content: ByteArray, contentType: ContentType?, offset: Int): RequestBody {
+        fun create(content: ByteArray, contentType: ContentType? = null, offset: Int): RequestBody {
             return object : RequestBody() {
                 override fun contentType() = contentType
 
@@ -39,7 +39,7 @@ abstract class RequestBody {
             }
         }
 
-        fun create(contentType: ContentType?, file: File): RequestBody {
+        fun create(contentType: ContentType? = null, file: File): RequestBody {
             return object : RequestBody() {
                 override fun contentType() = contentType
 

@@ -168,7 +168,7 @@ annotation class Path(
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Part(
     val value: String = "",
-    val encoding: String = "binary"
+    val encoding: String = ""
 )
 
 /**
@@ -184,5 +184,5 @@ annotation class Part(
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class PartMap(
-    val encoding: String = "binary"
+    val encoding: String = ""
 )

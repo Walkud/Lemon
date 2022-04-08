@@ -78,7 +78,7 @@ class MultipartBody private constructor(
                 outputStream.write(CRLF)
             }
 
-            part.encoding?.let { encoding ->
+            part.encoding?.takeIf { it.isNotEmpty() }?.let { encoding ->
                 val transferEncoding = "Content-Transfer-Encoding:$encoding"
                 outputStream.write(transferEncoding.toByteArray())
                 outputStream.write(CRLF)
@@ -112,8 +112,13 @@ class MultipartBody private constructor(
             parts.add(part)
         }
 
-        fun addPart(name: String, encoding: String?, file: File) {
-            addPart(Part.create(name, encoding, file))
+        fun addPart(
+            name: String,
+            encoding: String? = null,
+            contentType: ContentType? = null,
+            file: File
+        ) {
+            addPart(Part.create(name, encoding, contentType, file))
         }
 
         fun addPart(
@@ -143,12 +148,17 @@ class MultipartBody private constructor(
     ) {
         companion object {
 
-            fun create(name: String, encoding: String?, file: File): Part {
+            fun create(
+                name: String,
+                encoding: String? = null,
+                contentType: ContentType? = null,
+                file: File
+            ): Part {
                 return create(
                     name,
                     file.name,
                     encoding,
-                    create(ContentType.MULTIPART_FORM_DATA, file)
+                    create(contentType, file)
                 )
             }
 
