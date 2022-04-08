@@ -1,6 +1,5 @@
 package com.tube.http.request
 
-import com.tube.http.request.body.MultipartBody
 import java.nio.charset.Charset
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -86,4 +85,7 @@ class ContentType(
 
         return parse("${value}$dash$attribute=$parameterValue")
     }
+
+    override fun toString() = value
+
 }

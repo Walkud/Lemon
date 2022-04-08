@@ -46,11 +46,18 @@ interface KotlinApiService {
     @POST("post/part")
     @Multipart
     fun postPartBody(
-        @Part("msg") msg: String,
+        @Part("num") num: Int,
+        @Part("msg") msg: String?,
         @Part("partFile") singleFile: File,
         @Part part: MultipartBody.Part,
         @Part("contentRequestBody") contentRequestBody: RequestBody,
         @PartMap partMap: Map<String, Any>
+    ): Disposer<BaseResult<Void>>
+
+    @POST("post/part")
+    @Multipart
+    fun postPartBody(
+        @Part("msg") msg: String,
     ): Disposer<BaseResult<Void>>
 
 }

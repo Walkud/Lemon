@@ -1,14 +1,8 @@
 package com.tube.http
 
-import com.tube.http.disposer.Disposer
-import com.tube.http.disposer.impl.CreateDisposer
 import com.tube.http.request.body.FormBody
 import com.tube.http.request.body.MultipartBody
-import com.tube.http.request.body.RequestBody
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.InputStream
-import java.io.OutputStream
+import java.io.*
 import java.lang.StringBuilder
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -175,5 +169,17 @@ internal fun InputStream.tryClose() {
     try {
         close()
     } catch (t: Throwable) {
+    }
+}
+
+/**
+ * 读取文件流并写入 OutputStream
+ */
+internal fun FileInputStream.readTo(outputStream: OutputStream) {
+    var len: Int
+    val buffer = ByteArray(4096)
+    while (read(buffer).also { len = it } != -1) {
+        outputStream.write(buffer, 0, len)
+        outputStream.flush()
     }
 }

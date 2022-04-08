@@ -16,6 +16,10 @@ class MultipartBody private constructor(
 ) :
     RequestBody() {
 
+    private val contentType by lazy {
+        ContentType.MULTIPART_FORM_DATA.addParameter("boundary", boundary)
+    }
+
     companion object {
         private val CRLF = "\r\n".toByteArray()
         private val DASH = "--".toByteArray()
@@ -27,11 +31,9 @@ class MultipartBody private constructor(
         return byteOpt.size().toLong()
     }
 
-    override fun contentType() =
-        ContentType.MULTIPART_FORM_DATA.addParameter("boundary", "${String(DASH)}$boundary")
+    override fun contentType() = contentType
 
     override fun writeTo(outputStream: OutputStream) {
-
         for (part in parts) {
             val body = part.requestBody
 
@@ -39,22 +41,25 @@ class MultipartBody private constructor(
             outputStream.write(boundary.toByteArray())
             outputStream.write(CRLF)
 
-            val fileNamePart = part.fileName?.let { fileName ->
-                ";filename=\"$fileName\""
-            } ?: ""
+            val fileNameSb = StringBuilder()
+            part.fileName?.let { fileName ->
+                fileNameSb.append("; filename=\"")
+                fileNameSb.append(fileName)
+                fileNameSb.append("\"")
+            }
 
-            val disposition = "Content-Disposition:form-data; name=${part.name}$fileNamePart"
+            val disposition = "Content-Disposition:form-data; name=\"${part.name}\"$fileNameSb"
             outputStream.write(disposition.toByteArray())
             outputStream.write(CRLF)
+
+            body.contentType()?.let { contentType ->
+                outputStream.write("Content-Type:${contentType.value}".toByteArray())
+                outputStream.write(CRLF)
+            }
 
             part.encoding?.let { encoding ->
                 val transferEncoding = "Content-Transfer-Encoding:$encoding"
                 outputStream.write(transferEncoding.toByteArray())
-                outputStream.write(CRLF)
-            }
-
-            body.contentType()?.let { contentType ->
-                outputStream.write("Content-Type:${contentType.value}".toByteArray())
                 outputStream.write(CRLF)
             }
 

@@ -203,7 +203,7 @@ class KotlinUnitTest {
     @Test
     fun testPostPartBody() {
         val httpService = tubeHttp.create<KotlinApiService>()
-        val file = File("/Users/liya.zhu-mac/Documents/Android/workspace/my/TubeHttp/README.md")
+        val file = File("/Users/liya.zhu-mac/Desktop/test.txt")
         val part = MultipartBody.Part.create(
             name = "part",
             requestBody = RequestBody.Companion.create("Part Content!")
@@ -216,13 +216,15 @@ class KotlinUnitTest {
         )
 
         val partMap = mapOf(
+            "mapNum" to 234,
             "mapMsg" to "Map Msg Content!",
             "mapFile" to file,
             "mapPart" to mapPart,
             "mapRequestBody" to RequestBody.Companion.create(" Map Part Content!")
         )
 
-        httpService.postPartBody("Part msg!", file, part, contentRequestBody, partMap)
+        httpService.postPartBody(123, "Part msg!", file, part, contentRequestBody, partMap)
+//        httpService.postPartBody("Parg msg content1234567!")
             .subscribe(object : SampleAccepter<BaseResult<Void>>() {
                 override fun call(result: BaseResult<Void>) {
                     if (result.isSuccess()) {
@@ -232,6 +234,5 @@ class KotlinUnitTest {
                     }
                 }
             })
-
     }
 }

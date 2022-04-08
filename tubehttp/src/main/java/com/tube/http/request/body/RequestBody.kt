@@ -1,5 +1,6 @@
 package com.tube.http.request.body
 
+import com.tube.http.readTo
 import com.tube.http.request.ContentType
 import com.tube.http.tryClose
 import java.io.*
@@ -16,9 +17,7 @@ abstract class RequestBody {
         val EMPTY_BODY = create(ByteArray(0))
 
         fun create(content: String, contentType: ContentType? = null): RequestBody {
-            val charset = contentType?.let {
-                it.getCharset()
-            } ?: Charsets.UTF_8
+            val charset = contentType?.getCharset() ?: Charsets.UTF_8
 
             return create(content.toByteArray(charset), contentType)
         }
@@ -46,7 +45,7 @@ abstract class RequestBody {
 
                 override fun writeTo(outputStream: OutputStream) {
                     val inputStream = FileInputStream(file)
-                    outputStream.write(inputStream.readBytes())
+                    inputStream.readTo(outputStream)
                     inputStream.tryClose()
                 }
 
