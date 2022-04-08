@@ -8,6 +8,27 @@ import java.io.OutputStream
 
 /**
  * Describe:多部件请求 Body
+ * multipart/form-data 请求格式
+ * 假设 boundary 值为 xxxxxxxxxx，值为任意字符；普通参数约定字段为 aaa，值为 123456；文件约定字段为 textFile ，文件内容为 abcdefg，文件名称：abc.txt
+ * 1、请求头
+ * Content-Type:multipart/form-data;boundary=xxxxxxxxxxx ，boundary 为必须
+ *
+ * 2、消息体
+ * --xxxxxxxxxx                                                     //分界线，两个破折号(--) 加上 boundary 值（必须）
+ * Content-Disposition:form-data; name="aaa"                        //普通参数（必须）
+ * Content-Length: 6                                                //普通参数值长度(可选)
+ * \r\n                                                             //换行符（必须）
+ * 123456                                                           //普通参数值（必须）
+ * --xxxxxxxxxx                                                     //分界线，两个破折号(--) 加上 boundary 值（必须）
+ * Content-Disposition:form-data; name="aaa"; filename="abc.txt"    //文件（必须）
+ * Content-Type:text/plain                                          //文件类型(可选)
+ * Content-Transfer-Encoding:binary                                 //传输内容编码(可选)
+ * Content-Length: 6                                                //普通参数值长度(可选)
+ * \r\n                                                             //换行符（必须）
+ * abcdefg                                                          //文件内容（必须）
+ * --xxxxxxxxxx--                                                   //结束分界线，两个破折号(--) 加上 boundary 值加上两个破折号(--)（必须）
+ * \r\n                                                             //结束换行符（必须）
+ *
  * Created by liya.zhu on 2022/4/6
  */
 class MultipartBody private constructor(
