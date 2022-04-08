@@ -80,10 +80,12 @@ class MultipartBody private constructor(
         outputStream.write(CRLF)
     }
 
-    class Builder(private val boundary: String = TubeUtils.getRandomUUID32()) {
+    fun newBuilder() = Builder(boundary, parts.toMutableList())
 
-        private val parts = mutableListOf<Part>()
-
+    class Builder(
+        private val boundary: String = TubeUtils.getRandomUUID32(),
+        private val parts: MutableList<Part> = mutableListOf()
+    ) {
 
         fun addPart(part: Part) {
             parts.add(part)

@@ -30,10 +30,12 @@ class FormBody(val encodedNames: List<String>, val encodedValues: List<String>) 
         }
     }
 
-    class Builder {
+    fun newBuilder() = Builder(encodedNames.toMutableList(), encodedValues.toMutableList())
 
-        private val encodedNames = mutableListOf<String>()
-        private val encodedValues = mutableListOf<String>()
+    class Builder(
+        private val encodedNames: MutableList<String> = mutableListOf(),
+        private val encodedValues: MutableList<String> = mutableListOf()
+    ) {
 
         fun add(name: String, value: String, encode: Boolean = false) {
             encodedNames.add(name)
