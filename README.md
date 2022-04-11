@@ -10,5 +10,7 @@ TubeHttp 是一款针对于 Android 使用注解形式使接口适用于 Http �
 # TODO
 
 * Http 请求日志拦截器
-* 支持 Multipart 数据
+* 支持 Multipart 数据 (已支持)
+* 验证 sdk 依赖是否会传递
+* 研究协程方式调用的封装
 * 待补充
