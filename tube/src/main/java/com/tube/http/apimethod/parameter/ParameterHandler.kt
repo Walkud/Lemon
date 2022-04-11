@@ -17,7 +17,7 @@ interface ParameterHandler<in T> {
     fun apply(builder: Request.Builder, value: T?)
 
     /**
-     * 处理 @Body 注解实体类
+     * 处理 @ApiBody 注解实体类
      */
     class Body<T>(
         private val index: Int,
@@ -41,14 +41,14 @@ interface ParameterHandler<in T> {
                 TubeUtils.parameterError(
                     index,
                     method,
-                    "Body parameter value must not be null!"
+                    "ApiBody parameter value must not be null!"
                 )
             }
         }
     }
 
     /**
-     * 处理 @Field 注解，将参数添加到表单参数中
+     * 处理 @ApiField 注解，将参数添加到表单参数中
      */
     class Field(
         private val index: Int,
@@ -65,7 +65,7 @@ interface ParameterHandler<in T> {
     }
 
     /**
-     * 处理 @FieldMap 注解，将对应 Map 中的参数全部添加到表单参数中
+     * 处理 @ApiHeader 注解，将对应 Map 中的参数全部添加到表单参数中
      */
     class FieldMap(
         private val index: Int,
@@ -84,18 +84,18 @@ interface ParameterHandler<in T> {
                         TubeUtils.parameterError(
                             index,
                             method,
-                            "FieldMap value is null for key:${entry.key}!"
+                            "ApiField Map value is null for key:${entry.key}!"
                         )
                     }
                 }
             } else {
-                TubeUtils.parameterError(index, method, "FieldMap value must not be null!")
+                TubeUtils.parameterError(index, method, "ApiField Map value must not be null!")
             }
         }
     }
 
     /**
-     * 处理 @Header 注解，将参数添加到请求头参数中
+     * 处理 @ApiHeader 注解，将参数添加到请求头参数中
      */
     class Header(
         private val index: Int,
@@ -110,7 +110,7 @@ interface ParameterHandler<in T> {
     }
 
     /**
-     * 处理 @HeaderMap 注解，将对应的 Map 中的参数全部添加到请求头参数中
+     * 处理 @ApiHeader 注解，将对应的 Map 中的参数全部添加到请求头参数中
      */
     class HeaderMap(
         private val index: Int,
@@ -127,18 +127,18 @@ interface ParameterHandler<in T> {
                         TubeUtils.parameterError(
                             index,
                             method,
-                            "HeaderMap value is null for key:${entry.key}!"
+                            "ApiHeader Map value is null for key:${entry.key}!"
                         )
                     }
                 }
             } else {
-                TubeUtils.parameterError(index, method, "HeaderMap value must not be null!")
+                TubeUtils.parameterError(index, method, "ApiHeader Map value must not be null!")
             }
         }
     }
 
     /**
-     * 处理 @Path 注解，将使用实参替换请求路径替换符
+     * 处理 @ApiPath 注解，将使用实参替换请求路径替换符
      */
     class Path(
         private val index: Int,
@@ -184,7 +184,7 @@ interface ParameterHandler<in T> {
                     }
                 }
             } else {
-                TubeUtils.parameterError(index, method, "PartMap value must not be null!")
+                TubeUtils.parameterError(index, method, "ApiPart Map value must not be null!")
             }
         }
     }

@@ -15,49 +15,50 @@ import java.io.File
 @ApiUrl("tube/")
 interface KotlinApiService {
 
-    @GET("getServerTime")
+    @Api(
+        value = "getServerTime",
+        method = "POST",
+        headers = ["X-CALL-ID:call123", "X-Token:token123456"],
+        isMultipart = true
+    )
     fun getServerTime(): Disposer<BaseResult<ServerTime>>
 
-    @GET("commitClientTime?createTime=10002345")
-    fun commitClientTime(@Field("time") time: Long): Disposer<BaseResult<Void>>
+    @Api("commitClientTime?createTime=10002345")
+    fun commitClientTime(@ApiField("time") time: Long): Disposer<BaseResult<Void>>
 
-    @POST("post/{queryKey}")
-    fun postQuery(@Path("queryKey") path: String): Disposer<BaseResult<List<Item>>>
+    @Api("post/{queryKey}")
+    fun postQuery(@ApiPath("queryKey") path: String): Disposer<BaseResult<List<Item>>>
 
-    @POST("post/query")
-    @Headers(["X-Token:token123456"])
+    @Api("post/query", headers = ["X-Token:token123456"])
     fun postQuery(
-        @Field("type") type: String,
-        @Field("page") page: Int,
-        @Field("pageSize") pageSize: Int
+        @ApiField("type") type: String,
+        @ApiField("page") page: Int,
+        @ApiField("pageSize") pageSize: Int
     ): Disposer<BaseResult<List<Item>>>
 
-    @POST("post/query")
-    @Headers(["X-Token:token123456"])
+    @Api("post/query", headers = ["X-Token:token123456"])
     fun postQuery(
-        @Header("X-CALL-TIME") callTime: Long,
-        @HeaderMap headers: Map<String, Any>,
-        @FieldMap params: Map<String, Any>
+        @ApiHeader("X-CALL-TIME") callTime: Long,
+        @ApiHeader headers: Map<String, Any>,
+        @ApiField params: Map<String, Any>
     ): Disposer<BaseResult<List<Item>>>
 
-    @POST("post/body")
-    fun postBody(@Body reqBody: ReqBody): Disposer<BaseResult<Void>>
+    @Api("post/body")
+    fun postBody(@ApiBody reqBody: ReqBody): Disposer<BaseResult<Void>>
 
-    @POST("post/part")
-    @Multipart
+    @Api("post/part", isMultipart = true)
     fun postPartBody(
-        @Part("num") num: Int,
-        @Part("msg") msg: String?,
-        @Part("partFile") singleFile: File,
-        @Part part: MultipartBody.Part,
-        @Part("contentRequestBody") contentRequestBody: RequestBody,
-        @PartMap partMap: Map<String, Any>
+        @ApiPart("num") num: Int,
+        @ApiPart("msg") msg: String?,
+        @ApiPart("partFile") singleFile: File,
+        @ApiPart part: MultipartBody.Part,
+        @ApiPart("contentRequestBody") contentRequestBody: RequestBody,
+        @ApiPart partMap: Map<String, Any>
     ): Disposer<BaseResult<Void>>
 
-    @POST("post/part")
-    @Multipart
+    @Api("post/part", isMultipart = true)
     fun postPartBody(
-        @Part("msg") msg: String,
+        @ApiPart("msg") msg: String,
     ): Disposer<BaseResult<Void>>
 
 }

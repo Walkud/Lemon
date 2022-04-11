@@ -85,7 +85,7 @@ class Request private constructor(
         private val apiUrl: String,
         private val httpMethod: String,
         private val serviceUrlPath: String,
-        private var urlPath: String,
+        private var relativePath: String,
         private val headersBuilder: Headers.Builder,
         private val isMultipart: Boolean,
         private var body: RequestBody? = null
@@ -122,12 +122,12 @@ class Request private constructor(
             } else {
                 value
             }
-            val newUrlPath = urlPath.replace("{$name}", encodedValue)
+            val newUrlPath = relativePath.replace("{$name}", encodedValue)
             if (PATH_TRAVERSAL.matcher(newUrlPath).matches()) {
-                throw IllegalArgumentException("@Path parameters shouldn't perform path traversal ('.' or '..'):$value")
+                throw IllegalArgumentException("@ApiPath parameters shouldn't perform path traversal ('.' or '..'):$value")
             }
 
-            urlPath = newUrlPath
+            relativePath = newUrlPath
         }
 
         /**
@@ -183,7 +183,7 @@ class Request private constructor(
                 apiUrl,
                 httpMethod,
                 serviceUrlPath,
-                urlPath,
+                relativePath,
                 headersBuilder.build(),
                 isMultipart,
                 body

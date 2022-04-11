@@ -24,8 +24,8 @@ class ApiMethodParser(
     val originMethod: Method
 ) {
 
-    private var apiUrlPath = ""
-    private var urlPath = ""
+    private var apiUrl = ""
+    private var relativePath = ""
     private var httpMethod = ""
     private val headersBuilder = com.tube.http.request.Headers.Builder()
     private val parameterHandlers = mutableListOf<ParameterHandler<*>>()
@@ -55,8 +55,8 @@ class ApiMethodParser(
                 originMethod,
                 tube.apiUrl,
                 httpMethod,
-                apiUrlPath,
-                urlPath,
+                apiUrl,
+                relativePath,
                 headersBuilder,
                 isMultipart,
             )
@@ -77,8 +77,8 @@ class ApiMethodParser(
         for (annotation in classAnnotations) {
             when (annotation) {
                 is ApiUrl -> {
-                    if (apiUrlPath.isEmpty()) {
-                        apiUrlPath = annotation.value
+                    if (apiUrl.isEmpty()) {
+                        apiUrl = annotation.value
                     } else {
                         throw  IllegalArgumentException(
                             "Only one @ApiUrl annotation can be used!" +
@@ -98,43 +98,38 @@ class ApiMethodParser(
         val methodAnnotations = originMethod.annotations
         for (annotation in methodAnnotations) {
             when (annotation) {
-                is GET -> parseHttpMethod("GET", annotation, annotation.value)
-                is POST -> parseHttpMethod("POST", annotation, annotation.value)
-                is Headers -> parseMethodHeader(annotation, annotation.value)
-                is Multipart -> isMultipart = true
+                is Api -> parseApiAnotation(annotation)
             }
         }
     }
 
     /**
-     * 解析请求方法类型
+     * 解析请求Path、方法、请求头等
      */
-    private fun parseHttpMethod(httpMethod: String, annotation: Annotation, value: String) {
+    private fun parseApiAnotation(annotation: Api) {
         if (this.httpMethod.isEmpty()) {
-            this.httpMethod = httpMethod
-            this.urlPath = value
+            this.relativePath = annotation.value
+            this.httpMethod = annotation.method.uppercase()
+            this.isMultipart = annotation.isMultipart
+            val headers = annotation.headers
+            for (header in headers) {
+                val index = header.trim().indexOf(":")
+                if (index < 3 || index == header.length - 1) {
+                    throw IllegalArgumentException(
+                        "Check @Api headers format for $header!" +
+                                "for method:${originMethod.referenceName()}"
+                    )
+                }
+
+                val headerName = header.substring(0, index).trim()
+                val headerValue = header.substring(index + 1).trim()
+                headersBuilder.add(headerName, headerValue)
+            }
         } else {
             throw  IllegalArgumentException(
-                "Only one Http Method annotation can be used!" +
+                "Only one @Api annotation can be used!" +
                         "for method:${originMethod.referenceName()}"
             )
-        }
-    }
-
-    /**
-     * 解析请求头
-     */
-    private fun parseMethodHeader(annotation: Annotation, values: Array<String>) {
-        val annotationName = annotation::class.java.simpleName
-        for (value in values) {
-            val index = value.trim().indexOf(":")
-            if (index < 3 || index == value.length - 1) {
-                throw IllegalArgumentException("Check @$annotationName value format for $value!")
-            }
-
-            val headerName = value.substring(0, index).trim()
-            val headerValue = value.substring(index + 1).trim()
-            headersBuilder.add(headerName, headerValue)
         }
     }
 
@@ -158,76 +153,91 @@ class ApiMethodParser(
             }
 
             val parameterHandler = when (val annotation = annotations.first()) {
-                is Body -> {
+                is ApiBody -> {
                     val converter: Converter<*, RequestBody> =
                         tube.converterFinder.findRequestBodyConverter(type, originMethod)
                     ParameterHandler.Body(index, originMethod, converter)
                 }
-                is Field -> {
-                    val rawType = type.asRawType()
-                    if (rawType.isInvalidParameterType()) {
-                        throw  IllegalArgumentException(
-                            "@Field parameter type is invalid!" +
-                                    "for method:${originMethod.referenceName()},typeName:$type"
-                        )
-                    }
-
+                is ApiField -> {
                     val name = annotation.value
                     val encoded = annotation.encoded
-                    ParameterHandler.Field(index, originMethod, name, encoded)
+
+                    if (type.isMapParameterizedType()) {
+                        if (name.isNotEmpty()) {
+                            throw  IllegalArgumentException(
+                                "Map type @ApiField annotation value must be empty!" +
+                                        "for method:${originMethod.referenceName()},typeName:$type"
+                            )
+                        }
+
+                        if (type.isInvalidGenericParameterType()) {
+                            throw  IllegalArgumentException(
+                                "@ApiField Map generic types must be defined (e.g., Map<String, String>)!" +
+                                        "for method:${originMethod.referenceName()},typeName:$type"
+                            )
+                        }
+
+                        ParameterHandler.FieldMap(index, originMethod, encoded)
+                    } else {
+                        if (name.isEmpty()) {
+                            throw  IllegalArgumentException(
+                                "@ApiField annotation value cannot be empty!" +
+                                        "for method:${originMethod.referenceName()},typeName:$type"
+                            )
+                        }
+                        val rawType = type.asRawType()
+                        if (rawType.isInvalidParameterType()) {
+                            throw  IllegalArgumentException(
+                                "@ApiField parameter type is invalid!" +
+                                        "for method:${originMethod.referenceName()},typeName:$type"
+                            )
+                        }
+
+                        ParameterHandler.Field(index, originMethod, name, encoded)
+                    }
                 }
-                is FieldMap -> {
-                    if (type.isNotMapParameterizedType()) {
-                        throw  IllegalArgumentException(
-                            "@FieldMap parameter type must be Map!" +
-                                    "for method:${originMethod.referenceName()},typeName:$type"
-                        )
-                    }
-
-                    if (type.isInvalidGenericParameterType()) {
-                        throw  IllegalArgumentException(
-                            "@FieldMap Map generic types must be defined (e.g., Map<String, String>)!" +
-                                    "for method:${originMethod.referenceName()},typeName:$type"
-                        )
-                    }
-
-                    val encoded = annotation.encoded
-
-                    ParameterHandler.FieldMap(index, originMethod, encoded)
-                }
-                is Header -> {
-                    val rawType = type.asRawType()
-                    if (rawType.isInvalidParameterType()) {
-                        throw  IllegalArgumentException(
-                            "@Header parameter type is invalid!" +
-                                    "for method:${originMethod.referenceName()},typeName:$type"
-                        )
-                    }
+                is ApiHeader -> {
                     val name = annotation.value
-                    ParameterHandler.Header(index, originMethod, name)
-                }
-                is HeaderMap -> {
-                    if (type.isNotMapParameterizedType()) {
-                        throw  IllegalArgumentException(
-                            "@FieldMap parameter type must be Map!" +
-                                    "for method:${originMethod.referenceName()},typeName:$type"
-                        )
-                    }
+                    if (type.isMapParameterizedType()) {
+                        if (name.isNotEmpty()) {
+                            throw  IllegalArgumentException(
+                                "Map type @ApiHeader annotation value must be empty!" +
+                                        "for method:${originMethod.referenceName()},typeName:$type"
+                            )
+                        }
 
-                    if (type.isInvalidGenericParameterType()) {
-                        throw  IllegalArgumentException(
-                            "@FieldMap Map generic types must be defined (e.g., Map<String, String>)!" +
-                                    "for method:${originMethod.referenceName()},typeName:$type"
-                        )
-                    }
+                        if (type.isInvalidGenericParameterType()) {
+                            throw  IllegalArgumentException(
+                                "@ApiHeader Map generic types must be defined (e.g., Map<String, String>)!" +
+                                        "for method:${originMethod.referenceName()},typeName:$type"
+                            )
+                        }
 
-                    ParameterHandler.HeaderMap(index, originMethod)
+                        ParameterHandler.HeaderMap(index, originMethod)
+                    } else {
+                        if (name.isEmpty()) {
+                            throw  IllegalArgumentException(
+                                "@ApiHeader annotation value cannot be empty!" +
+                                        "for method:${originMethod.referenceName()},typeName:$type"
+                            )
+                        }
+
+                        val rawType = type.asRawType()
+                        if (rawType.isInvalidParameterType()) {
+                            throw  IllegalArgumentException(
+                                "@ApiHeader parameter type is invalid!" +
+                                        "for method:${originMethod.referenceName()},typeName:$type"
+                            )
+                        }
+
+                        ParameterHandler.Header(index, originMethod, name)
+                    }
                 }
-                is Path -> {
+                is ApiPath -> {
                     val rawType = type.asRawType()
                     if (rawType.isInvalidParameterType()) {
                         throw  IllegalArgumentException(
-                            "@Path parameter type is invalid!" +
+                            "@ApiPath parameter type is invalid!" +
                                     "for method:${originMethod.referenceName()},typeName:$type"
                         )
                     }
@@ -235,64 +245,63 @@ class ApiMethodParser(
                     val encoded = annotation.encoded
                     ParameterHandler.Path(index, originMethod, name, encoded)
                 }
-                is Part -> {
+                is ApiPart -> {
                     if (!isMultipart) {
                         throw  IllegalArgumentException(
-                            "@Part annotation must be used with the @Multipart annotation！" +
-                                    "for method:${originMethod.referenceName()},typeName:$type"
-                        )
-                    }
-
-                    if (type.isMapParameterizedType()) {
-                        throw  IllegalArgumentException(
-                            "@Part parameter does not support Map type.Use the @partMap annotation!" +
-                                    "for method:${originMethod.referenceName()},typeName:$type"
-                        )
-                    }
-
-                    val rawType = type.asRawType()
-                    if (rawType.isInvalidParameterType()) {
-                        throw  IllegalArgumentException(
-                            "@Part parameter type is invalid!" +
+                            "@ApiPart annotation must be used with the @Multipart annotation！" +
                                     "for method:${originMethod.referenceName()},typeName:$type"
                         )
                     }
 
                     val name = annotation.value
-                    if (name.isEmpty() && !rawType.isPartType()) {
-                        throw  IllegalArgumentException(
-                            "@Part value is empty, the parameter type must be MultipartBody.Part!" +
-                                    "for method:${originMethod.referenceName()},typeName:$type"
-                        )
-                    }
-
                     val encoding = annotation.encoding
-                    ParameterHandler.Part(index, originMethod, name, encoding)
-                }
-                is PartMap -> {
-                    if (!isMultipart) {
-                        throw  IllegalArgumentException(
-                            "@PartMap annotation must be used with the @Multipart annotation！" +
-                                    "for method:${originMethod.referenceName()},typeName:$type"
-                        )
-                    }
+                    val rawType = type.asRawType()
+                    when {
+                        type.isMapParameterizedType() -> {
+                            if (name.isNotEmpty()) {
+                                throw  IllegalArgumentException(
+                                    "Map type @ApiPart annotation value must be empty!" +
+                                            "for method:${originMethod.referenceName()},typeName:$type"
+                                )
+                            }
 
-                    if (type.isNotMapParameterizedType()) {
-                        throw  IllegalArgumentException(
-                            "@PartMap parameter type must be Map!" +
-                                    "for method:${originMethod.referenceName()},typeName:$type"
-                        )
-                    }
+                            if (type.isInvalidGenericParameterType()) {
+                                throw  IllegalArgumentException(
+                                    "@ApiPart Map generic types must be defined (e.g., Map<String, File>)!" +
+                                            "for method:${originMethod.referenceName()},typeName:$type"
+                                )
+                            }
 
-                    if (type.isInvalidGenericParameterType()) {
-                        throw  IllegalArgumentException(
-                            "@PartMap Map generic types must be defined (e.g., Map<String, File>)!" +
-                                    "for method:${originMethod.referenceName()},typeName:$type"
-                        )
-                    }
+                            ParameterHandler.PartMap(index, originMethod, encoding)
+                        }
+                        rawType.isPartType() -> {
+                            if (name.isNotEmpty()) {
+                                throw  IllegalArgumentException(
+                                    "MultipartBody.Part type @ApiPart annotation value must be empty!" +
+                                            "for method:${originMethod.referenceName()},typeName:$type"
+                                )
+                            }
 
-                    val encoding = annotation.encoding
-                    ParameterHandler.PartMap(index, originMethod, encoding)
+                            ParameterHandler.Part(index, originMethod, name, encoding)
+                        }
+                        else -> {
+                            if (rawType.isInvalidParameterType()) {
+                                throw  IllegalArgumentException(
+                                    "@ApiPart parameter type is invalid!" +
+                                            "for method:${originMethod.referenceName()},typeName:$type"
+                                )
+                            }
+
+                            if (name.isEmpty()) {
+                                throw  IllegalArgumentException(
+                                    "@ApiPart value is empty, the parameter type must be MultipartBody.Part!" +
+                                            "for method:${originMethod.referenceName()},typeName:$type"
+                                )
+                            }
+
+                            ParameterHandler.Part(index, originMethod, name, encoding)
+                        }
+                    }
                 }
                 else -> {
                     null

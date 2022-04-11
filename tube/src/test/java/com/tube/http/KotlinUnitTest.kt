@@ -143,7 +143,7 @@ class KotlinUnitTest {
                 }
 
                 override fun onError(throwable: Throwable) {
-                    println("Accepter onError :${throwable.message}")
+                    println("Accepter onError")
                 }
             })
     }
@@ -160,29 +160,27 @@ class KotlinUnitTest {
                 "X-SDK-VERSION-CODE" to BuildConfig.VERSION_CODE,
             ),
             mapOf("type" to "testType", "page" to 1, "pageSize" to 10)
-        )
-            .subscribe(object : SampleAccepter<BaseResult<List<Item>>>() {
-                override fun call(result: BaseResult<List<Item>>) {
-                    if (result.isSuccess()) {
-                        val sb = StringBuilder()
-                        for (datum in result.data) {
-                            if (sb.isNotEmpty()) {
-                                sb.append(",")
-                            }
-                            sb.append(datum.id)
+        ).subscribe(object : SampleAccepter<BaseResult<List<Item>>>() {
+            override fun call(result: BaseResult<List<Item>>) {
+                if (result.isSuccess()) {
+                    val sb = StringBuilder()
+                    for (datum in result.data) {
+                        if (sb.isNotEmpty()) {
+                            sb.append(",")
                         }
-                        println("Item ids:$sb")
-                    } else {
-                        println("ServerMsg:${result.msg}")
+                        sb.append(datum.id)
                     }
+                    println("Item ids:$sb")
+                } else {
+                    println("ServerMsg:${result.msg}")
                 }
+            }
 
-                override fun onError(throwable: Throwable) {
-                    super.onError(throwable)
-                    throwable.printStackTrace()
-                }
-
-            })
+            override fun onError(throwable: Throwable) {
+                super.onError(throwable)
+                println("postQuery error!")
+            }
+        })
     }
 
     @Test

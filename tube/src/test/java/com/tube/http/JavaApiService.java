@@ -3,7 +3,6 @@ package com.tube.http;
 import com.tube.http.bean.BaseResult;
 import com.tube.http.disposer.Disposer;
 
-import java.lang.reflect.WildcardType;
 import java.util.List;
 
 /**
@@ -13,8 +12,7 @@ import java.util.List;
 @ApiUrl("tube/")
 interface JavaApiService {
 
-    @POST("post/query")
-    @Headers({"X-Token:token123456"})
+    @Api(value = "post/query", method = "post", headers = {"X-Token:token123456"})
     Disposer<BaseResult<List<Item>>> postQuery(
-            @Field("type") String type, @Field("page") Integer page, @Field("pageSize") Integer pageSize);
+            @ApiField("type") String type, @ApiField("page") Integer page, @ApiField("pageSize") Integer pageSize);
 }
