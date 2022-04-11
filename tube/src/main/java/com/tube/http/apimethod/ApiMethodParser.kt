@@ -4,6 +4,7 @@ import com.tube.http.*
 import com.tube.http.apimethod.parameter.ParameterHandler
 import com.tube.http.converter.Converter
 import com.tube.http.disposer.Disposer
+import com.tube.http.request.HttpMethod
 import com.tube.http.request.Request
 import com.tube.http.request.body.RequestBody
 import java.lang.reflect.Method
@@ -22,10 +23,9 @@ class ApiMethodParser(
     val originService: Class<*>,
     val originMethod: Method
 ) {
-
     private var apiUrl = ""
     private var relativePath = ""
-    private var httpMethod = ""
+    private var httpMethod = HttpMethod.POST //默认使用 POST
     private val headersBuilder = com.tube.http.request.Headers.Builder()
     private val parameterHandlers = mutableListOf<ParameterHandler<*>>()
     private var isMultipart = false
@@ -124,29 +124,22 @@ class ApiMethodParser(
      * 解析请求Path、方法、请求头等
      */
     private fun parseApiAnotation(annotation: Api) {
-        if (this.httpMethod.isEmpty()) {
-            this.relativePath = annotation.value
-            this.httpMethod = annotation.method.uppercase()
-            this.isMultipart = annotation.isMultipart
-            val headers = annotation.headers
-            for (header in headers) {
-                val index = header.trim().indexOf(":")
-                if (index < 3 || index == header.length - 1) {
-                    throw IllegalArgumentException(
-                        "Check @Api headers format for $header!" +
-                                "for method:${originMethod.referenceName()}"
-                    )
-                }
-
-                val headerName = header.substring(0, index).trim()
-                val headerValue = header.substring(index + 1).trim()
-                headersBuilder.add(headerName, headerValue)
+        this.relativePath = annotation.value
+        this.httpMethod = annotation.method
+        this.isMultipart = annotation.isMultipart
+        val headers = annotation.headers
+        for (header in headers) {
+            val index = header.trim().indexOf(":")
+            if (index < 3 || index == header.length - 1) {
+                throw IllegalArgumentException(
+                    "Check @Api headers format for $header!" +
+                            "for method:${originMethod.referenceName()}"
+                )
             }
-        } else {
-            throw  IllegalArgumentException(
-                "Only one @Api annotation can be used!" +
-                        "for method:${originMethod.referenceName()}"
-            )
+
+            val headerName = header.substring(0, index).trim()
+            val headerValue = header.substring(index + 1).trim()
+            headersBuilder.add(headerName, headerValue)
         }
     }
 

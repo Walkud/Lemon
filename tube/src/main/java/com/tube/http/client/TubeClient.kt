@@ -56,7 +56,7 @@ class TubeClient private constructor(
 
             addHeaderPropertys(connection, request)
 
-            if (request.alllowBody()) {
+            if (request.hasBody()) {
                 request.body?.let {
                     val contentLength = it.contentLength()
                     if (contentLength == -1L) {
@@ -118,9 +118,9 @@ class TubeClient private constructor(
         connection.readTimeout = readTimeout()
         connection.connectTimeout = connectTimeout()
         connection.useCaches = false //不允许缓存
-        connection.requestMethod = request.httpMethod
+        connection.requestMethod = request.httpMethod.name
         connection.doInput = true
-        connection.doOutput = request.alllowBody()
+        connection.doOutput = request.hasBody()
 
         if (connection is HttpsURLConnection) {
             connection.sslSocketFactory = sslSocketFactory

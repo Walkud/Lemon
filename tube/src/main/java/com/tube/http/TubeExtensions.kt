@@ -45,16 +45,6 @@ internal fun String.appendPath(vararg urlPath: String): String {
 internal fun String.toURL() = URL(this)
 
 /**
- * 判断是否为 Get 请求 Method
- */
-internal fun String.isGetMethod() = "GET".equals(this, true)
-
-/**
- * 判断是否为 Post 请求 Method
- */
-internal fun String.isPostMethod() = "POST".equals(this, true)
-
-/**
  * 检测是否为默认方法
  */
 internal fun Method.checkDefault() =
@@ -101,23 +91,6 @@ internal fun Type.isValidGenericParameterType(): Boolean {
     }
     return false
 }
-
-/**
- * 检查是否带指定个数的泛型类型
- */
-internal fun Type.isValidGenericParameterType(count: Int): Boolean {
-    if (this is ParameterizedType) {
-        val types = actualTypeArguments
-        return types.size == count
-    }
-    return false
-}
-
-
-/**
- * 判断 Class 是否不为 Map 类型
- */
-internal fun Type.isNotMapParameterizedType() = !isMapParameterizedType()
 
 /**
  * 判断 Class 是否不为 Map 类型

@@ -2,9 +2,7 @@ package com.tube.http.request
 
 import com.tube.http.*
 import com.tube.http.appendPath
-import com.tube.http.isGetMethod
 import com.tube.http.isHttpProtocol
-import com.tube.http.isPostMethod
 import com.tube.http.request.body.FormBody
 import com.tube.http.request.body.MultipartBody
 import com.tube.http.request.body.RequestBody
@@ -21,7 +19,7 @@ class Request private constructor(
     val originService: Class<*>,
     val originMethod: Method,
     val apiUrl: String,
-    val httpMethod: String,
+    val httpMethod: HttpMethod,
     val serviceUrlPath: String,
     val urlPath: String,
     val headers: Headers,
@@ -42,7 +40,7 @@ class Request private constructor(
             apiUrl.appendPath(serviceUrlPath, urlPath)
         }
 
-        if (httpMethod.isGetMethod() && body is FormBody) {
+        if (httpMethod == HttpMethod.GET && body is FormBody) {
             val query = body.convertToQuery()
             return when (relativeUrl.indexOf("?")) {
                 -1 -> {
@@ -61,9 +59,9 @@ class Request private constructor(
     }
 
     /**
-     * 是否允许 Body
+     * 是否有 Body
      */
-    fun alllowBody() = httpMethod.isPostMethod()
+    fun hasBody() = httpMethod.hasBody()
 
     fun newBuilder(): Builder {
         return Builder(
@@ -83,7 +81,7 @@ class Request private constructor(
         private val originService: Class<*>,
         private val originMethod: Method,
         private val apiUrl: String,
-        private val httpMethod: String,
+        private val httpMethod: HttpMethod,
         private val serviceUrlPath: String,
         private var relativePath: String,
         private val headersBuilder: Headers.Builder,
@@ -171,7 +169,7 @@ class Request private constructor(
                     multipartBuilder != null -> {
                         body = multipartBuilder!!.build()
                     }
-                    httpMethod.isPostMethod() -> {
+                    httpMethod == HttpMethod.POST -> {
                         body = RequestBody.EMPTY_BODY
                     }
                 }

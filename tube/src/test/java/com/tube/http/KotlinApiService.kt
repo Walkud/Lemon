@@ -4,6 +4,7 @@ import com.tube.http.bean.BaseResult
 import com.tube.http.bean.ReqBody
 import com.tube.http.bean.ServerTime
 import com.tube.http.disposer.Disposer
+import com.tube.http.request.HttpMethod
 import com.tube.http.request.body.MultipartBody
 import com.tube.http.request.body.RequestBody
 import java.io.File
@@ -17,13 +18,13 @@ interface KotlinApiService {
 
     @Api(
         value = "getServerTime",
-        method = "GET",
+        method = HttpMethod.GET,
         headers = ["X-CALL-ID:call123", "X-Token:token123456"],
         isMultipart = true
     )
     fun getServerTime(): Disposer<BaseResult<ServerTime>>
 
-    @Api("commitClientTime?createTime=10002345", method = "get")
+    @Api("commitClientTime?createTime=10002345", method = HttpMethod.GET)
     fun commitClientTime(@ApiField("time") time: Long): Disposer<BaseResult<Void>>
 
     @Api("post/{queryKey}")

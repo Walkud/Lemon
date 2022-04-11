@@ -1,5 +1,7 @@
 package com.tube.http
 
+import com.tube.http.request.HttpMethod
+
 /**
  * Tube 注解声明文件
  * 以下注释代码说明基于 Koltin ，使用 Java 请参照对应写法。
@@ -35,9 +37,9 @@ annotation class ApiUrl(
  * Api 注解，表示请求以 某种 HttpMethod 方式发起请求，默认为 POST 请求。
  *
  * @param value url 相对路径。
- * @param method Http 请求方式(如：GET、POST等)，忽略大小写
- * @param headers 请求头参数数组
- * @param isMultipart 是否使用 multipart/form-data 方式提交数据
+ * @param method Http 请求方式(如：GET、POST等)，忽略大小写，@see ApiMethod。
+ * @param headers 请求头参数数组。
+ * @param isMultipart 是否使用 multipart/form-data 方式提交数据。
  *
  * 示例：
  * @Api(value = "xxx/yyy",method = "POST",headers = ["X-CALL-ID:call123", "X-Token:token123456"],isMultipart = true)
@@ -51,7 +53,7 @@ annotation class ApiUrl(
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Api(
     val value: String = "",
-    val method: String = "POST",
+    val method: HttpMethod = HttpMethod.POST,
     val headers: Array<String> = [],
     val isMultipart: Boolean = false
 )
