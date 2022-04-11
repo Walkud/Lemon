@@ -17,13 +17,13 @@ interface KotlinApiService {
 
     @Api(
         value = "getServerTime",
-        method = "POST",
+        method = "GET",
         headers = ["X-CALL-ID:call123", "X-Token:token123456"],
         isMultipart = true
     )
     fun getServerTime(): Disposer<BaseResult<ServerTime>>
 
-    @Api("commitClientTime?createTime=10002345")
+    @Api("commitClientTime?createTime=10002345", method = "get")
     fun commitClientTime(@ApiField("time") time: Long): Disposer<BaseResult<Void>>
 
     @Api("post/{queryKey}")
