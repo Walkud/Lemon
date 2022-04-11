@@ -19,7 +19,7 @@ import java.lang.reflect.ParameterizedType
  * Created by liya.zhu on 2022/3/4
  */
 class ApiMethodParser(
-    val tubeHttp: TubeHttp,
+    val tube: Tube,
     val originService: Class<*>,
     val originMethod: Method
 ) {
@@ -53,7 +53,7 @@ class ApiMethodParser(
             Request.Builder(
                 originService,
                 originMethod,
-                tubeHttp.baseUrl,
+                tube.baseUrl,
                 httpMethod,
                 serviceUrlPath,
                 urlPath,
@@ -160,7 +160,7 @@ class ApiMethodParser(
             val parameterHandler = when (val annotation = annotations.first()) {
                 is Body -> {
                     val converter: Converter<*, RequestBody> =
-                        tubeHttp.converterFinder.findRequestBodyConverter(type, originMethod)
+                        tube.converterFinder.findRequestBodyConverter(type, originMethod)
                     ParameterHandler.Body(index, originMethod, converter)
                 }
                 is Field -> {
@@ -322,7 +322,7 @@ class ApiMethodParser(
         if (genericReturnType is ParameterizedType) {
             val types = genericReturnType.actualTypeArguments
             if (types.size == 1) {
-                return tubeHttp.converterFinder.findResponseBodyConverter(types[0], originMethod)
+                return tube.converterFinder.findResponseBodyConverter(types[0], originMethod)
             }
         }
 

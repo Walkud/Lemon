@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap
  * 目的是首次解析目标方法，然后将结果放入缓存，随后都从缓存中获取已解析的 ApiMethod，降低系统开销
  * Created by liya.zhu on 2022/3/3
  */
-class ApiMethodFactory(val tubeHttp: TubeHttp) {
+class ApiMethodFactory(val tube: Tube) {
 
     private val methodCache: ConcurrentHashMap<Method, ApiMethod> =
         ConcurrentHashMap<Method, ApiMethod>()
@@ -33,6 +33,6 @@ class ApiMethodFactory(val tubeHttp: TubeHttp) {
      * 解析 Api 接口类与目标方法生成 ApiMethod
      */
     private fun getApiMethod(originService: Class<*>, originMethod: Method) =
-        ApiMethod(tubeHttp, ApiMethodParser(tubeHttp, originService, originMethod))
+        ApiMethod(tube, ApiMethodParser(tube, originService, originMethod))
 }
 

@@ -25,7 +25,7 @@ import java.util.regex.Pattern
  */
 class KotlinUnitTest {
 
-    private val tubeHttp = TubeHttp.build {
+    private val tube = Tube.build {
         setBaseUrl("http://localhost.charlesproxy.com:8080")
         addConverterFactory(GsonConverterFactory())
         addInterceptor(object : Interceptor {
@@ -38,14 +38,14 @@ class KotlinUnitTest {
                 return chain.proceed(newRequest)
             }
         })
-        setTubeHttpClient(
+        setTubeClient(
             TubeClient.Builder().setReadTimeout(30 * 1000).setConnectTimeout(30 * 1000).build()
         )
     }
 
     @Test
     fun testQueryServerTime() {
-        val httpService = tubeHttp.create<KotlinApiService>()
+        val httpService = tube.create<KotlinApiService>()
         httpService.getServerTime()
             .subscribe(object : SampleAccepter<BaseResult<ServerTime>>() {
                 override fun call(result: BaseResult<ServerTime>) {
@@ -60,7 +60,7 @@ class KotlinUnitTest {
 
     @Test
     fun testCommitClientTime() {
-        val httpService = tubeHttp.create<KotlinApiService>()
+        val httpService = tube.create<KotlinApiService>()
         httpService.commitClientTime(System.currentTimeMillis())
             .subscribe(object : SampleAccepter<BaseResult<Void>>() {
                 override fun call(result: BaseResult<Void>) {
@@ -150,7 +150,7 @@ class KotlinUnitTest {
 
     @Test
     fun testPostQuery() {
-        val httpService = tubeHttp.create<KotlinApiService>()
+        val httpService = tube.create<KotlinApiService>()
 //        httpService.postQuery("testType",1,10)
         val callTime = System.currentTimeMillis()
         httpService.postQuery(
@@ -187,7 +187,7 @@ class KotlinUnitTest {
 
     @Test
     fun testPostBody() {
-        val httpService = tubeHttp.create<KotlinApiService>()
+        val httpService = tube.create<KotlinApiService>()
         httpService.postBody(ReqBody(1, "call data info"))
             .subscribe(object : SampleAccepter<BaseResult<Void>>() {
                 override fun call(result: BaseResult<Void>) {
@@ -202,7 +202,7 @@ class KotlinUnitTest {
 
     @Test
     fun testPostPartBody() {
-        val httpService = tubeHttp.create<KotlinApiService>()
+        val httpService = tube.create<KotlinApiService>()
         val file = File("/Users/liya.zhu-mac/Desktop/test.txt")
         val part = MultipartBody.Part.create(
             name = "part",

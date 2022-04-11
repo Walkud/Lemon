@@ -15,7 +15,7 @@ import java.net.URL
  * Created by liya.zhu on 2022/3/2
  */
 
-inline fun <reified T : Any> TubeHttp.create(): T = create(T::class.java)
+inline fun <reified T : Any> Tube.create(): T = create(T::class.java)
 
 /**
  * 判断是否为 Http 或 Https 协议

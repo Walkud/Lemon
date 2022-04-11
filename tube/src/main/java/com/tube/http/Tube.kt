@@ -12,10 +12,10 @@ import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 
 /**
- * Describe: TubeHttp 是一款针对于 Android 使用注解形式使接口适用于 Http 请求的网络请求库。
+ * Describe: Tube 是一款针对于 Android 使用注解形式使接口适用于 Http 请求的网络请求库。
  * Created by liya.zhu on 2022/3/2
  */
-class TubeHttp private constructor(
+class Tube private constructor(
     val baseUrl: String,
     val converterFinder: ConverterFinder,
     val interceptors: List<Interceptor>
@@ -44,7 +44,7 @@ class TubeHttp private constructor(
                     }
 
                     if (method.checkDefault()) {//检查是否为默认方法
-                        throw RuntimeException("TubeHttp does not support interface default methods!")
+                        throw RuntimeException("Tube does not support interface default methods!")
                     }
 
                     val params = args ?: emptyArgs
@@ -80,15 +80,15 @@ class TubeHttp private constructor(
         /**
          * 设置 Http 客户端，可为空，默认为 TubeClient(使用 HttpURLConnection)
          */
-        fun setTubeHttpClient(httpClient: HttpClient) = apply { this.httpClient = httpClient }
+        fun setTubeClient(httpClient: HttpClient) = apply { this.httpClient = httpClient }
 
-        fun build(): TubeHttp {
+        fun build(): Tube {
 
             val finalBaseUrl =
-                baseUrl ?: throw IllegalArgumentException("TubeHttp baseUrl required!")
+                baseUrl ?: throw IllegalArgumentException("Tube baseUrl required!")
 
             if (!finalBaseUrl.isHttpProtocol()) {
-                throw IllegalArgumentException("TubeHttp baseUrl must be HTTP or HTTPS!")
+                throw IllegalArgumentException("Tube baseUrl must be HTTP or HTTPS!")
             }
 
             //如果未设置 HttpClient，则创建一个默认的 TubeClient
@@ -96,7 +96,7 @@ class TubeHttp private constructor(
             //添加请求实际调用拦截器
             interceptors.add(RealCallInterceptor(httpClient))
 
-            return TubeHttp(
+            return Tube(
                 finalBaseUrl,
                 ConverterFinder.create(converterFactors),
                 interceptors.toList()

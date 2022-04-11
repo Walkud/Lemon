@@ -19,7 +19,7 @@ internal class TubeUtils private constructor() {
     companion object {
 
         val userAgent by lazy {
-            "TubeHttp/${BuildConfig.VERSION_NAME}"
+            "Tube/${BuildConfig.VERSION_NAME}"
         }
 
         /**

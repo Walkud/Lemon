@@ -1,7 +1,7 @@
 package com.tube.http.apimethod
 
 import com.tube.http.HttpException
-import com.tube.http.TubeHttp
+import com.tube.http.Tube
 import com.tube.http.disposer.Disposer
 import com.tube.http.disposer.transformer.ConvertTransformer
 import com.tube.http.interceptor.ApplyChain
@@ -12,7 +12,7 @@ import com.tube.http.request.Request
  * Describe: Api 请求处理类
  * Created by liya.zhu on 2022/3/2
  */
-class ApiMethod(private val tubeHttp: TubeHttp, private val apiMethodParser: ApiMethodParser) {
+class ApiMethod(private val tube: Tube, private val apiMethodParser: ApiMethodParser) {
 
     /**
      * 处理 Api Service 方法实际调用
@@ -27,7 +27,7 @@ class ApiMethod(private val tubeHttp: TubeHttp, private val apiMethodParser: Api
             })
             .convert(object : ConvertTransformer<Request, Any> {
                 override fun convert(result: Request): Disposer<Any> {
-                    val response = ApplyChain.proceed(tubeHttp.interceptors, result)
+                    val response = ApplyChain.proceed(tube.interceptors, result)
 
                     if (response.isSuccess()) {
                         val responseConverter = apiMethodParser.responseConverter
