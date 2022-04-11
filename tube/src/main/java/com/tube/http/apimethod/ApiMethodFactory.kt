@@ -33,6 +33,6 @@ class ApiMethodFactory(val tube: Tube) {
      * 解析 Api 接口类与目标方法生成 ApiMethod
      */
     private fun getApiMethod(originService: Class<*>, originMethod: Method) =
-        ApiMethod(tube, ApiMethodParser(tube, originService, originMethod))
+        ApiMethodParser(tube, originService, originMethod).getApiMethod()
 }
 

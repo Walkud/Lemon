@@ -6,7 +6,6 @@ import com.tube.http.converter.Converter
 import com.tube.http.disposer.Disposer
 import com.tube.http.request.Request
 import com.tube.http.request.body.RequestBody
-import com.tube.http.request.body.ResponseBody
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 
@@ -30,8 +29,6 @@ class ApiMethodParser(
     private val headersBuilder = com.tube.http.request.Headers.Builder()
     private val parameterHandlers = mutableListOf<ParameterHandler<*>>()
     private var isMultipart = false
-    var responseConverter: Converter<ResponseBody, *>
-        private set
 
     init {
         //解析 Api 接口类注解
@@ -40,8 +37,6 @@ class ApiMethodParser(
         parseMethodAnnotation()
         //解析目标方法形参注解
         parseParameter()
-        //解析目标方法返回类型，并找到相应消息体转换器
-        responseConverter = parseReturnType()
     }
 
     /**
@@ -67,6 +62,28 @@ class ApiMethodParser(
         }
 
         return reuqestBuilder.build()
+    }
+
+    /**
+     * 获取 ApiMethod
+     */
+    fun getApiMethod(): ApiMethod {
+        val returnType = originMethod.returnType
+        var converterType = originMethod.genericReturnType
+        val isDisposer = Disposer::class.java.isAssignableFrom(returnType)
+        if (isDisposer) {
+            if (converterType is ParameterizedType) {
+                converterType = converterType.actualTypeArguments[0]
+            } else {
+                throw IllegalArgumentException(
+                    "Disposer generic types must be defined!" +
+                            "for method:${originMethod.referenceName()},returnTypeName:$converterType"
+                )
+            }
+        }
+
+        val converter = tube.converterFinder.findResponseBodyConverter(converterType, originMethod)
+        return ApiMethod(tube, this, converter, isDisposer)
     }
 
     /**
@@ -312,32 +329,5 @@ class ApiMethodParser(
                 parameterHandlers.add(it)
             }
         }
-    }
-
-    /**
-     * 解析目标方法返回类型，并找到相应消息体转换器
-     */
-    private fun parseReturnType(): Converter<ResponseBody, *> {
-        val returnType = originMethod.returnType
-
-        if (!Disposer::class.java.isAssignableFrom(returnType)) {
-            throw IllegalArgumentException(
-                "Return type must be Disposer class!" +
-                        "for method:${originMethod.referenceName()},returnTypeName:$returnType"
-            )
-        }
-
-        val genericReturnType = originMethod.genericReturnType
-        if (genericReturnType is ParameterizedType) {
-            val types = genericReturnType.actualTypeArguments
-            if (types.size == 1) {
-                return tube.converterFinder.findResponseBodyConverter(types[0], originMethod)
-            }
-        }
-
-        throw IllegalArgumentException(
-            "Disposer generic types must be defined!" +
-                    "for method:${originMethod.referenceName()},returnTypeName:$genericReturnType"
-        )
     }
 }

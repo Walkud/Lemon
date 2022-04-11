@@ -221,16 +221,23 @@ class KotlinUnitTest {
             "mapRequestBody" to RequestBody.Companion.create(" Map Part Content!")
         )
 
-        httpService.postPartBody(123, "Part msg!", file, part, contentRequestBody, partMap)
-//        httpService.postPartBody("Parg msg content1234567!")
-            .subscribe(object : SampleAccepter<BaseResult<Void>>() {
-                override fun call(result: BaseResult<Void>) {
-                    if (result.isSuccess()) {
-                        println("postPartBody code:${result.code},msg:${result.msg}")
-                    } else {
-                        print("serverError:${result.msg}")
-                    }
-                }
-            })
+        try {
+            val result =
+                httpService.postPartBody(123, "Part msg!", file, part, contentRequestBody, partMap)
+            println("postPartBody code:${result.code},msg:${result.msg}")
+        } catch (t: Throwable) {
+            t.printStackTrace()
+        }
+
+//        httpService.postPartBody(123, "Part msg!", file, part, contentRequestBody, partMap)
+//            .subscribe(object : SampleAccepter<BaseResult<Void>>() {
+//                override fun call(result: BaseResult<Void>) {
+//                    if (result.isSuccess()) {
+//                        println("postPartBody code:${result.code},msg:${result.msg}")
+//                    } else {
+//                        print("serverError:${result.msg}")
+//                    }
+//                }
+//            })
     }
 }

@@ -54,11 +54,5 @@ interface KotlinApiService {
         @ApiPart part: MultipartBody.Part,
         @ApiPart("contentRequestBody") contentRequestBody: RequestBody,
         @ApiPart partMap: Map<String, Any>
-    ): Disposer<BaseResult<Void>>
-
-    @Api("post/part", isMultipart = true)
-    fun postPartBody(
-        @ApiPart("msg") msg: String,
-    ): Disposer<BaseResult<Void>>
-
+    ): BaseResult<Void>
 }
