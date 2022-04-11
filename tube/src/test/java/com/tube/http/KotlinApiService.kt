@@ -12,7 +12,7 @@ import java.io.File
  * Describe:
  * Created by liya.zhu on 2022/3/3
  */
-@BaseUrl("tube/")
+@ApiUrl("tube/")
 interface KotlinApiService {
 
     @GET("getServerTime")

@@ -10,7 +10,7 @@ import java.util.List;
  * Describe:
  * Created by liya.zhu on 2022/3/7
  */
-@BaseUrl("tube/")
+@ApiUrl("tube/")
 interface JavaApiService {
 
     @POST("post/query")

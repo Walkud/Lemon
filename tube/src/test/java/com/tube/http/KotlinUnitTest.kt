@@ -26,7 +26,7 @@ import java.util.regex.Pattern
 class KotlinUnitTest {
 
     private val tube = Tube.build {
-        setBaseUrl("http://localhost.charlesproxy.com:8080")
+        setApiUrl("http://localhost.charlesproxy.com:8080")
         addConverterFactory(GsonConverterFactory())
         addInterceptor(object : Interceptor {
             override fun intercept(chain: Interceptor.Chain): Response {

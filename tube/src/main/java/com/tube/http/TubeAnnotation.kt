@@ -3,30 +3,30 @@ package com.tube.http
 /**
  * Tube 注解声明文件
  * 以下注释代码说明基于 Koltin ，使用 Java 请参照对应写法。
- * 以下注释说明初始化 baseUrl 值都以 "https://api.test.com" 作参照。
+ * 以下注释说明初始化 apiUrl 值都以 "https://api.test.com" 作参照。
  *
  */
 
 /**
- * 接口 Api @BaseUrl 注解，用于替换初始化的 baseUrl 或追加相对 Path 路径。
+ * 接口 Api @ApiUrl 注解，用于替换初始化的 apiUrl 或追加相对 Path 路径。
  *
  * @param value url 绝对或相对路径。
  *
- * 场景1：value 值为 "https://newapi.test.com"，前缀为 http 或 https 会认为是完整 BaseUrl ，会替换掉初始化的 baseUrl。
- * 示例1：条件(接口类 @BaseUrl 注解 value 值为 "https://newapi.test.com"， 方法 @GET 或 @POST 注解 value 值为 "yyy")
- * 未使用 @BaseUrl 场景最终请求 Url 为 "https://api.test.com/yyy"
- * 使用 @BaseUrl 场景最终请求 Url 为 "https://newapi.test.com/yyy"
+ * 场景1：value 值为 "https://newapi.test.com"，前缀为 http 或 https 会认为是完整 ApiUrl ，会替换掉初始化的 apiUrl。
+ * 示例1：条件(接口类 @ApiUrl 注解 value 值为 "https://newapi.test.com"， 方法 @GET 或 @POST 注解 value 值为 "yyy")
+ * 未使用 @ApiUrl 场景最终请求 Url 为 "https://api.test.com/yyy"
+ * 使用 @ApiUrl 场景最终请求 Url 为 "https://newapi.test.com/yyy"
  *
- * 场景2：value 值为 "xxx/"，前缀不为 http 或 https 会被认为是相对 Path，会与追加到初始化的 baseUrl 之后，再与方法上的 @GET 或 @POST 注解 value 进行拼接。
- * 示例2：条件(接口类 @BaseUrl 注解 value 值为 "xxx/"， 方法 @GET 或 @POST 注解 value 值为 "yyy")
- * 未使用 @BaseUrl 场景最终请求 Url 为 "https://api.test.com/yyy"
- * 使用 @BaseUrl 场景最终请求 Url 为 "https://api.test.com/xxx/yyy"
+ * 场景2：value 值为 "xxx/"，前缀不为 http 或 https 会被认为是相对 Path，会与追加到初始化的 apiUrl 之后，再与方法上的 @GET 或 @POST 注解 value 进行拼接。
+ * 示例2：条件(接口类 @ApiUrl 注解 value 值为 "xxx/"， 方法 @GET 或 @POST 注解 value 值为 "yyy")
+ * 未使用 @ApiUrl 场景最终请求 Url 为 "https://api.test.com/yyy"
+ * 使用 @ApiUrl 场景最终请求 Url 为 "https://api.test.com/xxx/yyy"
  *
- * 注意：@BaseUrl 注解使用相对路径时 value 值请尽量不要以 "/" 开头，因为可能会出现 "https://api.test.com//xxx/yyy" 情况。
+ * 注意：@ApiUrl 注解使用相对路径时 value 值请尽量不要以 "/" 开头，因为可能会出现 "https://api.test.com//xxx/yyy" 情况。
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class BaseUrl(
+annotation class ApiUrl(
     val value: String = ""
 )
 

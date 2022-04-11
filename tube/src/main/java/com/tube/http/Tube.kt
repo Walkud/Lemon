@@ -16,7 +16,7 @@ import java.lang.reflect.Proxy
  * Created by liya.zhu on 2022/3/2
  */
 class Tube private constructor(
-    val baseUrl: String,
+    val apiUrl: String,
     val converterFinder: ConverterFinder,
     val interceptors: List<Interceptor>
 ) {
@@ -55,15 +55,15 @@ class Tube private constructor(
     }
 
     class Builder {
-        private var baseUrl: String? = null
+        private var apiUrl: String? = null
         private val converterFactors: MutableList<Converter.Factory> = mutableListOf()
         private val interceptors: MutableList<Interceptor> = mutableListOf()
         private var httpClient: HttpClient? = null
 
         /**
-         * 设置请求 base url，例如：https://api.test.com
+         * 设置请求 api url，例如：https://api.test.com
          */
-        fun setBaseUrl(baseUrl: String) = apply { this.baseUrl = baseUrl }
+        fun setApiUrl(apiUrl: String) = apply { this.apiUrl = apiUrl }
 
         /**
          * 添加数据转换器工厂，通常是 json 格式的转换工厂
@@ -84,11 +84,11 @@ class Tube private constructor(
 
         fun build(): Tube {
 
-            val finalBaseUrl =
-                baseUrl ?: throw IllegalArgumentException("Tube baseUrl required!")
+            val finalApiUrl =
+                apiUrl ?: throw IllegalArgumentException("Tube apiUrl required!")
 
-            if (!finalBaseUrl.isHttpProtocol()) {
-                throw IllegalArgumentException("Tube baseUrl must be HTTP or HTTPS!")
+            if (!finalApiUrl.isHttpProtocol()) {
+                throw IllegalArgumentException("Tube apiUrl must be HTTP or HTTPS!")
             }
 
             //如果未设置 HttpClient，则创建一个默认的 TubeClient
@@ -97,7 +97,7 @@ class Tube private constructor(
             interceptors.add(RealCallInterceptor(httpClient))
 
             return Tube(
-                finalBaseUrl,
+                finalApiUrl,
                 ConverterFinder.create(converterFactors),
                 interceptors.toList()
             )

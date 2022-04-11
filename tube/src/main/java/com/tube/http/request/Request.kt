@@ -20,7 +20,7 @@ import java.util.regex.Pattern
 class Request private constructor(
     val originService: Class<*>,
     val originMethod: Method,
-    val baseUrl: String,
+    val apiUrl: String,
     val httpMethod: String,
     val serviceUrlPath: String,
     val urlPath: String,
@@ -39,7 +39,7 @@ class Request private constructor(
         val relativeUrl = if (serviceUrlPath.isHttpProtocol()) {
             serviceUrlPath.appendPath(urlPath)
         } else {
-            baseUrl.appendPath(serviceUrlPath, urlPath)
+            apiUrl.appendPath(serviceUrlPath, urlPath)
         }
 
         if (httpMethod.isGetMethod() && body is FormBody) {
@@ -69,7 +69,7 @@ class Request private constructor(
         return Builder(
             originService,
             originMethod,
-            baseUrl,
+            apiUrl,
             httpMethod,
             serviceUrlPath,
             urlPath,
@@ -82,7 +82,7 @@ class Request private constructor(
     class Builder(
         private val originService: Class<*>,
         private val originMethod: Method,
-        private val baseUrl: String,
+        private val apiUrl: String,
         private val httpMethod: String,
         private val serviceUrlPath: String,
         private var urlPath: String,
@@ -180,7 +180,7 @@ class Request private constructor(
             return Request(
                 originService,
                 originMethod,
-                baseUrl,
+                apiUrl,
                 httpMethod,
                 serviceUrlPath,
                 urlPath,

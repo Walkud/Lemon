@@ -24,7 +24,7 @@ class ApiMethodParser(
     val originMethod: Method
 ) {
 
-    private var serviceUrlPath = ""
+    private var apiUrlPath = ""
     private var urlPath = ""
     private var httpMethod = ""
     private val headersBuilder = com.tube.http.request.Headers.Builder()
@@ -53,9 +53,9 @@ class ApiMethodParser(
             Request.Builder(
                 originService,
                 originMethod,
-                tube.baseUrl,
+                tube.apiUrl,
                 httpMethod,
-                serviceUrlPath,
+                apiUrlPath,
                 urlPath,
                 headersBuilder,
                 isMultipart,
@@ -76,12 +76,12 @@ class ApiMethodParser(
         val classAnnotations = originService.annotations
         for (annotation in classAnnotations) {
             when (annotation) {
-                is BaseUrl -> {
-                    if (serviceUrlPath.isEmpty()) {
-                        serviceUrlPath = annotation.value
+                is ApiUrl -> {
+                    if (apiUrlPath.isEmpty()) {
+                        apiUrlPath = annotation.value
                     } else {
                         throw  IllegalArgumentException(
-                            "Only one @BaseUrl annotation can be used!" +
+                            "Only one @ApiUrl annotation can be used!" +
                                     "for class:${originService.name}"
                         )
                     }
