@@ -9,6 +9,8 @@ import com.tube.http.disposer.Disposer
 import com.tube.http.disposer.transformer.ConvertTransformer
 import com.tube.http.disposer.transformer.WarpTransformer
 import com.tube.http.interceptor.Interceptor
+import com.tube.http.log.TubeLogInterceptor
+import com.tube.http.log.TubeLogLevel
 import com.tube.http.request.Response
 import com.tube.http.request.body.MultipartBody
 import com.tube.http.request.body.RequestBody
@@ -38,6 +40,7 @@ class KotlinUnitTest {
                 return chain.proceed(newRequest)
             }
         })
+        addInterceptor(TubeLogInterceptor(TubeLogLevel.BODY))
         setTubeClient(
             TubeClient.Builder().setReadTimeout(30 * 1000).setConnectTimeout(30 * 1000).build()
         )
