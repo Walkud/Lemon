@@ -81,8 +81,10 @@ class TubeClient private constructor(
             var body: ResponseBody? = null
 
             if (code in 200..299) {
-                if (code !in 204..205) {
-                    body = ResponseBody.create(
+                body = if (code in 204..205) {
+                    ResponseBody.EMPTY_BODY
+                } else {
+                    ResponseBody.create(
                         connection.inputStream.readBytes(),
                         headers.getContentType()
                     )
