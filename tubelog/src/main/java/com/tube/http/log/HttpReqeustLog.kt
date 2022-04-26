@@ -1,6 +1,6 @@
-package com.tube.http.log.bean
+package com.tube.http.log
 
-import com.tube.http.log.TubeLogLevel
+import com.tube.http.client.HttpClient
 import com.tube.http.request.Request
 import com.tube.http.request.Response
 import com.tube.http.request.body.FormBody
@@ -20,16 +20,44 @@ class HttpReqeustLog(val level: TubeLogLevel) {
 
     /**
      * 获取请求日志
+     * 1、构建新的 Request
+     * 2、构建请求日志内容
+     * @param request 原请求
+     * @return 请求日志内容
      */
     fun getRequestLog(request: Request): String {
-        val requestBodyContent = buildNewRequest(request)
+        var bodyContent = ""
+        //构建新的 Request，并返回请求消息体内容
+        val builder = request.newBuilder().setBody(null)
+        request.body?.let { body ->
+            val bodyByteArray = ByteArrayOutputStream().let { baops ->
+                body.writeTo(baops)
+                baops.toByteArray()
+            }
+
+            val charset = body.contentType()?.getCharset() ?: Charsets.UTF_8
+            bodyContent = String(bodyByteArray, charset)
+
+            //重新构建 Body,防止内部引用导致内存泄漏
+            val newRequestBody = when (body) {
+                is FormBody -> body.newBuilder().build()
+                is MultipartBody -> body.newBuilder().build()
+                else -> RequestBody.Companion.create(bodyByteArray, body.contentType())
+            }
+            builder.setBody(newRequestBody)
+        }
+
+        val finalRequest = HttpClient.addDefaultHeaders(builder.build()).also { newRequest ->
+            this.request = newRequest
+        }
+
         return StringBuilder().apply {
 
-            val methodName = request.httpMethod.name
+            val methodName = finalRequest.httpMethod.name
             append("Request ")
             append(methodName)
             append(" ")
-            append(request.url)
+            append(finalRequest.url)
             append(" ")
 
             if (level.value >= TubeLogLevel.ALL.value) {
@@ -37,16 +65,16 @@ class HttpReqeustLog(val level: TubeLogLevel) {
                 append("\n")
                 append("APISERVICE:\n")
                 append("ApiServiceClassName:")
-                append(request.originService.name)
+                append(finalRequest.originService.name)
                 append("\n")
                 append("ApiServiceMehodName:")
-                append(request.originMethod.name)
+                append(finalRequest.originMethod.name)
             }
 
             if (level.value >= TubeLogLevel.HEADERS.value) {
                 //构建请求头信息
                 append("\n")
-                val headersMap = request.headers.getRequestHeaders()
+                val headersMap = finalRequest.headers.getRequestHeaders()
                 append("HEADERS:\n")
                 for (key in headersMap.keys) {
                     append(key)
@@ -56,14 +84,13 @@ class HttpReqeustLog(val level: TubeLogLevel) {
                 }
             }
 
-            val requestBody = request.body
-            val bodyLengthStr = requestBody?.let {
+            val bodyLengthStr = finalRequest.body?.let {
                 "(${it.contentLength()} byte body)"
             } ?: ""
 
             if (level.value >= TubeLogLevel.BODY.value) {
                 append("BODY:\n")
-                append(requestBodyContent)
+                append(bodyContent)
             }
 
             append("\n")
@@ -122,44 +149,5 @@ class HttpReqeustLog(val level: TubeLogLevel) {
             append("END ")
             append(bodyLengthStr)
         }.toString()
-    }
-
-    /**
-     * 构建新的 Request，并返回请求消息体内容
-     */
-    private fun buildNewRequest(request: Request): String {
-        var requestBodyContent = ""
-        val builder = Request.Builder(
-            request.originService,
-            request.originMethod,
-            request.apiUrl,
-            request.httpMethod,
-            request.urlPath,
-            request.serviceUrlPath,
-            request.headers.newBuilder(),
-            request.isMultipart,
-            null,
-        )
-
-        request.body?.let { body ->
-            val bodyByteArray = ByteArrayOutputStream().let { baops ->
-                body.writeTo(baops)
-                baops.toByteArray()
-            }
-
-            val charset = body.contentType()?.getCharset() ?: Charsets.UTF_8
-            requestBodyContent = String(bodyByteArray, charset)
-
-            //重新构建 Body
-            val newRequestBody = when (body) {
-                is FormBody -> body.newBuilder().build()
-                is MultipartBody -> body.newBuilder().build()
-                else -> RequestBody.Companion.create(bodyByteArray, body.contentType())
-            }
-            builder.setBody(newRequestBody)
-        }
-        this.request = builder.build()
-
-        return requestBodyContent
     }
 }

@@ -1,7 +1,6 @@
 package com.tube.http.log
 
 import com.tube.http.interceptor.Interceptor
-import com.tube.http.log.bean.HttpReqeustLog
 import com.tube.http.log.logger.DefaultTubeLogger
 import com.tube.http.request.Response
 
