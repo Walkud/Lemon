@@ -12,7 +12,7 @@ import com.tube.http.toURL
  * @see <a href="https://github.com/square/okhttp">OkHttp</a>
  * Created by liya.zhu on 2022/3/18
  */
-class RealCallInterceptor(private val httpClient: HttpClient) : Interceptor {
+internal class RealCallInterceptor(private val httpClient: HttpClient) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()

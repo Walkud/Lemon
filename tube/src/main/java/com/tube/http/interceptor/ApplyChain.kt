@@ -7,7 +7,7 @@ import com.tube.http.request.Response
  * Describe:应用链，开始执行链式调用
  * Created by liya.zhu on 2022/3/18
  */
-class ApplyChain(
+internal class ApplyChain(
     private val interceptor: List<Interceptor>,
     private val nextIndex: Int,
     private val originalRequest: Request

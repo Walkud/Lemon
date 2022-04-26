@@ -13,7 +13,7 @@ import com.tube.http.request.body.ResponseBody
  * Describe: Api 请求处理类
  * Created by liya.zhu on 2022/3/2
  */
-class ApiMethod(
+internal class ApiMethod(
     private val tube: Tube,
     private val apiMethodParser: ApiMethodParser,
     private val responseConverter: Converter<ResponseBody, *>,

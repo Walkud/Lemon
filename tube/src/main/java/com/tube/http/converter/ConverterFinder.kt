@@ -10,7 +10,7 @@ import java.lang.reflect.Type
  * Describe:数据对象转换器查找器，用于根据 Type 匹配合适的数据对象转换器
  * Created by liya.zhu on 2022/3/25
  */
-class ConverterFinder private constructor(private val converterFactors: List<Converter.Factory>) {
+internal class ConverterFinder private constructor(private val converterFactors: List<Converter.Factory>) {
 
     companion object {
         /**

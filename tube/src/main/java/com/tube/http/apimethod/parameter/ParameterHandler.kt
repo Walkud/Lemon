@@ -12,7 +12,7 @@ import java.lang.reflect.Method
  * 作用：方法参数解析时生成对应参数处理方式
  * Created by liya.zhu on 2022/3/7
  */
-interface ParameterHandler<in T> {
+internal interface ParameterHandler<in T> {
 
     fun apply(builder: Request.Builder, value: T?)
 

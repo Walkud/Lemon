@@ -18,7 +18,7 @@ import java.lang.reflect.ParameterizedType
  * 4、解析目标方法返回类型
  * Created by liya.zhu on 2022/3/4
  */
-class ApiMethodParser(
+internal class ApiMethodParser(
     val tube: Tube,
     val originService: Class<*>,
     val originMethod: Method

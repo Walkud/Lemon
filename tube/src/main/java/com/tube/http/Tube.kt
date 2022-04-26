@@ -16,9 +16,9 @@ import java.lang.reflect.Proxy
  * Created by liya.zhu on 2022/3/2
  */
 class Tube private constructor(
-    val apiUrl: String,
-    val converterFinder: ConverterFinder,
-    val interceptors: List<Interceptor>
+    internal val apiUrl: String,
+    internal val converterFinder: ConverterFinder,
+    internal val interceptors: List<Interceptor>
 ) {
 
     private val apiMthodFactory = ApiMethodFactory(this)
