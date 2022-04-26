@@ -204,7 +204,7 @@ class KotlinUnitTest {
     @Test
     fun testPostPartBody() {
         val httpService = tube.create<KotlinApiService>()
-        val file = File("/Users/liya.zhu-mac/Desktop/test.txt")
+        val file = File("/Users/liya-zhu/Desktop/test.txt")
         val part = MultipartBody.Part.create(
             name = "part",
             requestBody = RequestBody.Companion.create("Part Content!")
