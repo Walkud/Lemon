@@ -26,7 +26,7 @@ class HttpReqeustLog(val level: TubeLogLevel) {
      * @return 请求日志内容
      */
     fun getRequestLog(request: Request): String {
-        var bodyContent = ""
+        var bodyContent: String? = null
         //构建新的 Request，并返回请求消息体内容
         val builder = request.newBuilder().setBody(null)
         request.body?.let { body ->
@@ -52,7 +52,6 @@ class HttpReqeustLog(val level: TubeLogLevel) {
         }
 
         return StringBuilder().apply {
-
             val methodName = finalRequest.httpMethod.name
             append("Request ")
             append(methodName)
@@ -88,12 +87,14 @@ class HttpReqeustLog(val level: TubeLogLevel) {
                 "(${it.contentLength()} byte body)"
             } ?: ""
 
-            if (level.value >= TubeLogLevel.BODY.value) {
-                append("BODY:\n")
-                append(bodyContent)
+            bodyContent?.let {
+                if (level.value >= TubeLogLevel.BODY.value) {
+                    append("BODY:\n")
+                    append(bodyContent)
+                }
+                append("\n")
             }
 
-            append("\n")
             append("Request ")
             append(methodName)
             append(" ")
@@ -112,15 +113,16 @@ class HttpReqeustLog(val level: TubeLogLevel) {
         return StringBuilder().apply {
             val request = response.request
             val methodName = request.httpMethod.name
+            append("\n")
             append("Response ")
             append(methodName)
             append(" ")
             append(request.url)
 
-            val requestBody = request.body
-            val bodyLengthStr = requestBody?.let {
+            val responseBody = response.body
+            val bodyLengthStr = responseBody.let {
                 "($time ms,${it.contentLength()} byte body)"
-            } ?: ""
+            }
 
             if (level.value >= TubeLogLevel.HEADERS.value) {
                 append("\n")
@@ -140,14 +142,15 @@ class HttpReqeustLog(val level: TubeLogLevel) {
                     val charset = it.contentType()?.getCharset() ?: Charsets.UTF_8
                     append(String(it.byteArray(), charset))
                 }
+                append("\n")
             }
 
-            append("\n")
             append("Response ")
             append(methodName)
             append(" ")
             append("END ")
             append(bodyLengthStr)
+            append("\n\n")
         }.toString()
     }
 }
