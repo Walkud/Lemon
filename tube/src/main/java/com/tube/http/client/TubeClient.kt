@@ -32,7 +32,8 @@ class TubeClient private constructor(
 
     override fun execute(request: Request): Response {
         try {
-            return call(request)
+            val finalRequest = HttpClient.addDefaultHeaders(request)
+            return call(finalRequest)
         } catch (e: MalformedURLException) {
             throw HttpException.create("Url is not absolute:${request.url}", e)
         }
