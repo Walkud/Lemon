@@ -1,5 +1,7 @@
 package com.tube.http
 
+import com.tube.http.adapter.ApiAdapter
+import com.tube.http.adapter.ApiAdapterFinder
 import com.tube.http.client.TubeClient
 import com.tube.http.client.HttpClient
 import com.tube.http.converter.Converter
@@ -18,6 +20,7 @@ import java.lang.reflect.Proxy
 class Tube private constructor(
     internal val apiUrl: String,
     internal val converterFinder: ConverterFinder,
+    internal val apiAdapterFinder: ApiAdapterFinder,
     internal val interceptors: List<Interceptor>
 ) {
 
@@ -56,6 +59,7 @@ class Tube private constructor(
 
     class Builder {
         private var apiUrl: String? = null
+        private val apiAdapterFactorys: MutableList<ApiAdapter.Factory> = mutableListOf()
         private val converterFactors: MutableList<Converter.Factory> = mutableListOf()
         private val interceptors: MutableList<Interceptor> = mutableListOf()
         private var httpClient: HttpClient? = null
@@ -64,6 +68,13 @@ class Tube private constructor(
          * 设置请求 api url，例如：https://api.test.com
          */
         fun setApiUrl(apiUrl: String) = apply { this.apiUrl = apiUrl }
+
+        /**
+         * 添加 Api 适配器工厂，用于转换返回结果类型
+         */
+        fun addApiAdapterFactory(apiAdapterFactory: ApiAdapter.Factory) = apply {
+            apiAdapterFactorys.add(apiAdapterFactory)
+        }
 
         /**
          * 添加数据转换器工厂，通常是 json 格式的转换工厂
@@ -99,9 +110,9 @@ class Tube private constructor(
             return Tube(
                 finalApiUrl,
                 ConverterFinder.create(converterFactors),
+                ApiAdapterFinder.create(apiAdapterFactorys),
                 interceptors.toList()
             )
         }
-
     }
 }

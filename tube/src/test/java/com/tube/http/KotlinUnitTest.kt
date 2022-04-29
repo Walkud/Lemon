@@ -6,6 +6,7 @@ import com.tube.http.bean.ServerTime
 import com.tube.http.client.TubeClient
 import com.tube.http.disposer.Accepter
 import com.tube.http.disposer.Disposer
+import com.tube.http.disposer.adapter.DisposerApiAdapterFactory
 import com.tube.http.disposer.transformer.ConvertTransformer
 import com.tube.http.disposer.transformer.WarpTransformer
 import com.tube.http.interceptor.Interceptor
@@ -30,6 +31,7 @@ class KotlinUnitTest {
     private val tube = Tube.build {
         setApiUrl("http://localhost.charlesproxy.com:8080")
         addConverterFactory(GsonConverterFactory())
+        addApiAdapterFactory(DisposerApiAdapterFactory())
         addInterceptor(object : Interceptor {
             override fun intercept(chain: Interceptor.Chain): Response {
                 val request = chain.request()

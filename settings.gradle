@@ -2,3 +2,4 @@ rootProject.name = "Tube"
 include ':app'
 include ':tube'
 include ':log'
+include ':disposer'

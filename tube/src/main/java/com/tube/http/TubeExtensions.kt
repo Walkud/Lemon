@@ -99,7 +99,7 @@ internal fun Type.isMapParameterizedType() =
     this is ParameterizedType && Map::class.java.isAssignableFrom(this.rawType as Class<*>)
 
 /**
- * 获取 Type 的 Class<*> 类型
+ * 获取 Type 类型的类或接口类型，例如:List<String> 返回 List
  */
 internal fun Type.asRawType(): Class<*> {
     return when (this) {

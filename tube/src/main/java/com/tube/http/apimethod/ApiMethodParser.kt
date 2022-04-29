@@ -3,12 +3,10 @@ package com.tube.http.apimethod
 import com.tube.http.*
 import com.tube.http.apimethod.parameter.ParameterHandler
 import com.tube.http.converter.Converter
-import com.tube.http.disposer.Disposer
 import com.tube.http.request.HttpMethod
 import com.tube.http.request.Request
 import com.tube.http.request.body.RequestBody
 import java.lang.reflect.Method
-import java.lang.reflect.ParameterizedType
 
 /**
  * Describe: Api 接口与目标方法解析器
@@ -68,22 +66,11 @@ internal class ApiMethodParser(
      * 获取 ApiMethod
      */
     fun getApiMethod(): ApiMethod {
-        val returnType = originMethod.returnType
-        var converterType = originMethod.genericReturnType
-        val isDisposer = Disposer::class.java.isAssignableFrom(returnType)
-        if (isDisposer) {
-            if (converterType is ParameterizedType) {
-                converterType = converterType.actualTypeArguments[0]
-            } else {
-                throw IllegalArgumentException(
-                    "Disposer generic types must be defined!" +
-                            "for method:${originMethod.referenceName()},returnTypeName:$converterType"
-                )
-            }
-        }
-
-        val converter = tube.converterFinder.findResponseBodyConverter(converterType, originMethod)
-        return ApiMethod(tube, this, converter, isDisposer)
+        val genericReturnType = originMethod.genericReturnType
+        val apiAdapter = tube.apiAdapterFinder.findApiAdapter(genericReturnType, originMethod)
+        val actualType = apiAdapter.getActualType(genericReturnType)
+        val converter = tube.converterFinder.findResponseBodyConverter(actualType, originMethod)
+        return ApiMethod(tube, this, converter, apiAdapter)
     }
 
     /**

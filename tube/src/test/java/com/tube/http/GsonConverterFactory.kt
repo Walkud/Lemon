@@ -14,10 +14,7 @@ import java.lang.reflect.Type
  */
 class GsonConverterFactory(val gson: Gson = Gson()) : Converter.Factory {
 
-    override fun requestBodyConverter(
-        type: Type,
-        originMethod: Method
-    ): Converter<*, RequestBody> {
+    override fun requestBodyConverter(type: Type, method: Method): Converter<*, RequestBody> {
         return object : Converter<Any, RequestBody> {
             override fun convert(value: Any): RequestBody {
                 return RequestBody.create(gson.toJson(value, type), ContentType.JSON)
@@ -25,18 +22,12 @@ class GsonConverterFactory(val gson: Gson = Gson()) : Converter.Factory {
         }
     }
 
-    override fun responseBodyConverter(
-        type: Type,
-        originMethod: Method
-    ): Converter<ResponseBody, *> {
+    override fun responseBodyConverter(type: Type, method: Method): Converter<ResponseBody, *> {
         return object : Converter<ResponseBody, Any> {
             override fun convert(value: ResponseBody): Any {
-                val charset = value.contentType()?.let {
-                    it.getCharset()
-                } ?: Charsets.UTF_8
+                val charset = value.contentType()?.getCharset() ?: Charsets.UTF_8
                 return gson.fromJson(String(value.byteArray(), charset), type)
             }
-
         }
     }
 }

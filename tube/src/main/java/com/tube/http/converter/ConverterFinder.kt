@@ -14,7 +14,7 @@ internal class ConverterFinder private constructor(private val converterFactors:
 
     companion object {
         /**
-         * 创建查找器
+         * 创建转换器查找器
          * @param converterFactors 扩展的转换器工厂
          */
         fun create(converterFactors: MutableList<Converter.Factory>): ConverterFinder {
@@ -26,10 +26,7 @@ internal class ConverterFinder private constructor(private val converterFactors:
     /**
      * 查找请求体数据对象转换器
      */
-    fun findRequestBodyConverter(
-        type: Type,
-        originMethod: Method
-    ): Converter<*, RequestBody> {
+    fun findRequestBodyConverter(type: Type, originMethod: Method): Converter<*, RequestBody> {
         for (converterFactor in converterFactors) {
             val converter = converterFactor.requestBodyConverter(
                 type, originMethod
@@ -41,7 +38,7 @@ internal class ConverterFinder private constructor(private val converterFactors:
         }
 
         throw  IllegalArgumentException(
-            "Could not locate RequestBody converter " +
+            "Could not find RequestBody converter " +
                     "for method:${originMethod.referenceName()},typeName:$type"
         )
     }
@@ -49,15 +46,9 @@ internal class ConverterFinder private constructor(private val converterFactors:
     /**
      * 查找请求响应消息体数据对象转换器
      */
-    fun findResponseBodyConverter(
-        type: Type,
-        originMethod: Method
-    ): Converter<ResponseBody, *> {
+    fun findResponseBodyConverter(type: Type, originMethod: Method): Converter<ResponseBody, *> {
         for (converterFactor in converterFactors) {
-            val converter = converterFactor.responseBodyConverter(
-                type,
-                originMethod
-            )
+            val converter = converterFactor.responseBodyConverter(type, originMethod)
 
             if (converter != null) {
                 return converter
@@ -73,11 +64,14 @@ internal class ConverterFinder private constructor(private val converterFactors:
     /**
      * 内置的请求体及响应消息体转换器，内置：String、RequestBody、ResponseBody 转换器
      */
-    class BuildInConverterFactory : Converter.Factory {
+    private class BuildInConverterFactory : Converter.Factory {
 
+        /**
+         * 返回默认响应消息体转换器
+         */
         override fun responseBodyConverter(
             type: Type,
-            originMethod: Method
+            method: Method
         ): Converter<ResponseBody, *>? {
             if (type === String::class.java) {
                 return object : Converter<ResponseBody, String> {
@@ -96,10 +90,10 @@ internal class ConverterFinder private constructor(private val converterFactors:
             return null
         }
 
-        override fun requestBodyConverter(
-            type: Type,
-            originMethod: Method
-        ): Converter<*, RequestBody>? {
+        /**
+         * 返回默认请求消息体转换器
+         */
+        override fun requestBodyConverter(type: Type, method: Method): Converter<*, RequestBody>? {
             if (type === String::class.java) {
                 return object : Converter<Any, RequestBody> {
                     override fun convert(value: Any): RequestBody {
@@ -115,8 +109,5 @@ internal class ConverterFinder private constructor(private val converterFactors:
             }
             return null
         }
-
     }
-
-
 }
