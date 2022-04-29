@@ -30,6 +30,11 @@ abstract class Disposer<T> {
     internal abstract fun onlyCall(): Disposer<T>
 
     /**
+     * 取消事件传递
+     */
+    abstract fun cancel()
+
+    /**
      * 事件包裹，用于事件处理扩展
      */
     fun <R> warp(transformer: WarpTransformer<T, R>): Disposer<R> = transformer.transform(this)
@@ -61,7 +66,5 @@ abstract class Disposer<T> {
     /**
      * 订阅，开始传递事件
      */
-    fun subscribe(accepter: Accepter<T>) {
-        transmit(accepter)
-    }
+    fun subscribe(accepter: Accepter<T>) = apply { transmit(accepter) }
 }

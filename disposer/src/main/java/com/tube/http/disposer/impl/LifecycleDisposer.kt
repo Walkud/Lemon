@@ -8,22 +8,22 @@ import com.tube.http.disposer.Disposer
  * Created by liya.zhu on 2022/3/21
  */
 class LifecycleDisposer<T>(
-    private val disposer: Disposer<T>,
-    private val action: LifecycleAction
+    private var disposer: Disposer<T>?,
+    private var action: LifecycleAction?
 ) : Disposer<T>() {
 
     override fun transmit(accepter: Accepter<T>) {
-        disposer.transmit(LifecycleAccepter(accepter, action))
+        disposer?.transmit(LifecycleAccepter(accepter, action))
     }
 
-    override fun onlyCall() = apply { disposer.onlyCall() }
+    override fun onlyCall() = apply { disposer?.onlyCall() }
 
     /**
      * 生命周期事件接收器，用于分发 doStart、doEnd、doError 事件
      */
     class LifecycleAccepter<T>(
         private val accepter: Accepter<T>,
-        private val action: LifecycleAction
+        private val action: LifecycleAction?
     ) : AbstractLifecycleAccepter<T>(accepter) {
 
         override fun call(result: T) {
@@ -85,5 +85,11 @@ class LifecycleDisposer<T>(
                 block.invoke(throwable)
             }
         }
+    }
+
+    override fun cancel() {
+        disposer?.cancel()
+        disposer = null
+        action = null
     }
 }

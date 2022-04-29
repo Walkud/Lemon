@@ -16,12 +16,22 @@ class CreateDisposer<T>(private val value: T) : Disposer<T>() {
     private var onlyCall = false
 
     /**
+     * 是否取消
+     */
+    private var cancel = false
+
+    /**
      * 设置仅传递 call 事件 (仅内部使用)
      * 当该实例为非事件源头时需调用此方法，如未调用则可能出现多次触发传递生命周期事件
      */
     override fun onlyCall() = apply { onlyCall = true }
 
     override fun transmit(accepter: Accepter<T>) {
+        if (cancel) {
+            //已取消，不传递事件
+            return
+        }
+
         if (onlyCall) {
             accepter.call(value)
         } else {
@@ -34,5 +44,9 @@ class CreateDisposer<T>(private val value: T) : Disposer<T>() {
                 accepter.onEnd()
             }
         }
+    }
+
+    override fun cancel() {
+        cancel = true
     }
 }

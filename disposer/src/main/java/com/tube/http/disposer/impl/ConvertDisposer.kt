@@ -9,15 +9,15 @@ import com.tube.http.disposer.transformer.ConvertTransformer
  * Created by liya.zhu on 2022/3/23
  */
 class ConvertDisposer<T, R>(
-    private val disposer: Disposer<T>,
-    private val transformer: ConvertTransformer<T, R>
+    private var disposer: Disposer<T>?,
+    private var transformer: ConvertTransformer<T, R>?
 ) : Disposer<R>() {
 
     override fun transmit(accepter: Accepter<R>) {
-        disposer.transmit(ConvertAccepter(accepter, transformer))
+        disposer?.transmit(ConvertAccepter(accepter, transformer))
     }
 
-    override fun onlyCall() = apply { disposer.onlyCall() }
+    override fun onlyCall() = apply { disposer?.onlyCall() }
 
     /**
      * 事件转换接收器
@@ -27,13 +27,21 @@ class ConvertDisposer<T, R>(
      */
     class ConvertAccepter<T, R>(
         private val accepter: Accepter<R>,
-        private val transformer: ConvertTransformer<T, R>
+        private val transformer: ConvertTransformer<T, R>?
     ) : AbstractLifecycleAccepter<T>(accepter) {
 
         override fun call(result: T) {
-            transformer.convert(result)
-                .onlyCall()
-                .transmit(accepter)
+            transformer?.let {
+                it.convert(result)
+                    .onlyCall()
+                    .transmit(accepter)
+            }
         }
+    }
+
+    override fun cancel() {
+        disposer?.cancel()
+        disposer = null
+        transformer = null
     }
 }
