@@ -22,9 +22,9 @@ class LifecycleDisposer<T>(
      * 生命周期事件接收器，用于分发 doStart、doEnd、doError 事件
      */
     class LifecycleAccepter<T>(
-        private val accepter: Accepter<T>,
+        accepter: Accepter<T>,
         private val action: LifecycleAction?
-    ) : AbstractLifecycleAccepter<T>(accepter) {
+    ) : AbstractLifecycleAccepter<T, T>(accepter) {
 
         override fun call(result: T) {
             accepter.call(result)

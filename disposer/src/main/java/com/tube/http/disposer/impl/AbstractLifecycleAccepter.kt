@@ -6,7 +6,7 @@ import com.tube.http.disposer.Accepter
  * Describe:抽象的生命周期事件接收器，用于统一处理生命周期事件消息传递
  * Created by liya.zhu on 2022/3/29
  */
-abstract class AbstractLifecycleAccepter<T>(private val accepter: Accepter<*>) : Accepter<T> {
+abstract class AbstractLifecycleAccepter<T, R>(protected val accepter: Accepter<R>) : Accepter<T> {
 
     /**
      * 开始时间

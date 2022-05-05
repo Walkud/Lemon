@@ -26,9 +26,9 @@ class ConvertDisposer<T, R>(
      * 3、执行事件 R 处理器，继续传递事件 R
      */
     class ConvertAccepter<T, R>(
-        private val accepter: Accepter<R>,
+        accepter: Accepter<R>,
         private val transformer: ConvertTransformer<T, R>?
-    ) : AbstractLifecycleAccepter<T>(accepter) {
+    ) : AbstractLifecycleAccepter<T, R>(accepter) {
 
         override fun call(result: T) {
             transformer?.let {
