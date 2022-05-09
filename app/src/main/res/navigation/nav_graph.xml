@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.tube.http.FirstFragment"
-        android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
+        android:name="com.tube.http.TstFragment"
+        android:label="语言翻译"
+        tools:layout="@layout/fragment_tst">
 
         <action
             android:id="@+id/action_FirstFragment_to_SecondFragment"
@@ -17,9 +17,9 @@
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="com.tube.http.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
+        android:name="com.tube.http.WeatherFragment"
+        android:label="城市天气预报"
+        tools:layout="@layout/fragment_weather">
 
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
