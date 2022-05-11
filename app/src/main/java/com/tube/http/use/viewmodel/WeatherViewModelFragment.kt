@@ -56,7 +56,7 @@ class WeatherViewModelFragment : BaseFragment() {
         }
 
         binding.queryBtn.setOnClickListener {
-            weatherViewModel.getCityWeatherInfo(cityCode)
+            getCityWeatherInfo()
         }
 
         val adapter =
@@ -72,8 +72,7 @@ class WeatherViewModelFragment : BaseFragment() {
             ) {
                 val city = cityCodes[position]
                 cityCode = city.split(":")[1]
-                progressDialog.show()
-                weatherViewModel.getCityWeatherInfo(cityCode)
+                getCityWeatherInfo()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -86,6 +85,11 @@ class WeatherViewModelFragment : BaseFragment() {
             }
             binding.resultTv.text = it
         })
+    }
+
+    private fun getCityWeatherInfo() {
+        progressDialog.show()
+        weatherViewModel.getCityWeatherInfo(cityCode)
     }
 
     override fun onDestroyView() {
