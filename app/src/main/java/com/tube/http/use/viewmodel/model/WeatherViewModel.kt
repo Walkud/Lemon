@@ -1,4 +1,4 @@
-package com.tube.http.model
+package com.tube.http.use.viewmodel.model
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,19 +9,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.Exception
 
-class TstViewModel : ViewModel() {
+class WeatherViewModel : ViewModel() {
 
-    var translationResult = MutableLiveData<String>()
+    var cityWeatherResult = MutableLiveData<String>()
 
-    fun languageTranslation(text: String) {
+    fun getCityWeatherInfo(cityCode: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val translationText = try {
-                val result = Net.getTstApiService().languageTranslation(text)
+                val createTime = System.currentTimeMillis()
+                val result = Net.getWeatherApiService().getCityWeatherInfo(cityCode, createTime)
                 Gson().toJson(result)
             } catch (e: Exception) {
-                "languageTranslation Exception :${e.message}"
+                "getCityWeatherInfo Exception :${e.message}"
             }
-            translationResult.postValue(translationText)
+            cityWeatherResult.postValue(translationText)
         }
     }
 }

@@ -1,27 +1,25 @@
-package com.tube.http
+package com.tube.http.use.simple
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.google.gson.Gson
+import com.tube.http.R
 import com.tube.http.databinding.FragmentWeatherBinding
-import com.tube.http.model.TstViewModel
-import com.tube.http.model.WeatherViewModel
+import com.tube.http.net.Net
+import com.tube.http.use.BaseFragment
+import kotlinx.coroutines.*
 
 /**
- * 城市天气预报 Fragment
+ * 简单使用示例 城市天气预报 Fragment
  */
-class WeatherFragment : Fragment() {
+class WeatherFragment : BaseFragment(), CoroutineScope by MainScope() {
 
     private var _binding: FragmentWeatherBinding? = null
-    private val weatherViewModel by viewModels<WeatherViewModel>()
     private val cityCodes =
         listOf(
             "北京:101010100",
@@ -57,7 +55,7 @@ class WeatherFragment : Fragment() {
         }
 
         binding.queryBtn.setOnClickListener {
-            weatherViewModel.getCityWeatherInfo(cityCode)
+            queryCityWeatherInfo()
         }
 
         val adapter =
@@ -73,20 +71,34 @@ class WeatherFragment : Fragment() {
             ) {
                 val city = cityCodes[position]
                 cityCode = city.split(":")[1]
-                weatherViewModel.getCityWeatherInfo(cityCode)
+                queryCityWeatherInfo()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
+    }
 
-        weatherViewModel.cityWeatherResult.observe(requireActivity(), Observer {
-            binding.resultTv.text = it
-        })
+    private fun queryCityWeatherInfo() {
+        launch {
+            progressDialog.show()
+            binding.resultTv.text = try {
+                val result = withContext(Dispatchers.IO) {
+                    val createTime = System.currentTimeMillis()
+                    Net.getWeatherApiService().getCityWeatherInfo(cityCode, createTime)
+                }
+                Gson().toJson(result)
+            } catch (e: Exception) {
+                "获取城市天气异常：${e.message}"
+            }
+
+            progressDialog.dismiss()
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        cancel()
     }
 }

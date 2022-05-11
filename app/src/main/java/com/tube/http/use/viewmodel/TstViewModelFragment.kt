@@ -1,7 +1,6 @@
-package com.tube.http
+package com.tube.http.use.viewmodel
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,13 +8,15 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.tube.http.R
 import com.tube.http.databinding.FragmentTstBinding
-import com.tube.http.model.TstViewModel
+import com.tube.http.use.BaseFragment
+import com.tube.http.use.viewmodel.model.TstViewModel
 
 /**
  * 语言翻译 Fragment
  */
-class TstFragment : Fragment() {
+class TstViewModelFragment : BaseFragment() {
 
     private var _binding: FragmentTstBinding? = null
     private val tstViewModel by viewModels<TstViewModel>()
@@ -43,13 +44,17 @@ class TstFragment : Fragment() {
         binding.queryBtn.setOnClickListener {
             val text = binding.textEt.text.toString()
             if (text.isNotEmpty()) {
+                progressDialog.show()
                 tstViewModel.languageTranslation(text)
             } else {
                 Toast.makeText(requireContext(), "翻译的文本不能为空!", Toast.LENGTH_SHORT).show()
             }
         }
 
-        tstViewModel.translationResult.observe(requireActivity(), Observer {
+        tstViewModel.translationResult.observe(viewLifecycleOwner, Observer {
+            if (progressDialog.isShowing) {
+                progressDialog.dismiss()
+            }
             binding.resultTv.text = it
         })
     }
@@ -57,5 +62,6 @@ class TstFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        tstViewModel.translationResult.removeObservers(viewLifecycleOwner)
     }
 }
