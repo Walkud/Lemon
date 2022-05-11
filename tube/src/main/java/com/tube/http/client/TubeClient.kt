@@ -50,12 +50,12 @@ class TubeClient private constructor(
      * 发起请求调用
      */
     private fun call(request: Request): Response {
-        val connection = openConnection(request)
-
+        var connection: HttpURLConnection? = null
         var ops: OutputStream? = null
         var inps: InputStream? = null
 
         try {
+            connection = openConnection(request)
 
             addHeaderPropertys(connection, request)
 
@@ -103,10 +103,12 @@ class TubeClient private constructor(
                 .build()
         } catch (e: IOException) {
             throw HttpException.create("Execute request exception to ${request.url}", e)
+        } catch (e: HttpException) {
+            throw e
         } finally {
             inps?.tryClose()
             ops?.tryClose()
-            connection.disconnect()
+            connection?.disconnect()
         }
     }
 
