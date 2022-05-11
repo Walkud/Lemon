@@ -13,7 +13,10 @@ class ConvertDisposer<T, R>(
     private var transformer: ConvertTransformer<T, R>?
 ) : Disposer<R>() {
 
+    private var accepter: Accepter<R>? = null
+
     override fun transmit(accepter: Accepter<R>) {
+        this.accepter = accepter
         disposer?.transmit(ConvertAccepter(accepter, transformer))
     }
 
@@ -60,6 +63,8 @@ class ConvertDisposer<T, R>(
     override fun cancel() {
         disposer?.cancel()
         disposer = null
+        accepter?.onCancel()
+        accepter = null
         transformer = null
     }
 }

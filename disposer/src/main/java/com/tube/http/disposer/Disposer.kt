@@ -1,8 +1,7 @@
 package com.tube.http.disposer
 
-import com.tube.http.disposer.impl.ConvertDisposer
-import com.tube.http.disposer.impl.CreateDisposer
-import com.tube.http.disposer.impl.EventActionDisposer
+import androidx.lifecycle.Lifecycle
+import com.tube.http.disposer.impl.*
 import com.tube.http.disposer.transformer.ConvertTransformer
 import com.tube.http.disposer.transformer.WarpTransformer
 
@@ -41,6 +40,12 @@ abstract class Disposer<T> {
     fun <R> convert(transformer: ConvertTransformer<T, R>) = ConvertDisposer(this, transformer)
 
     /**
+     * 绑定 UI 生命周期
+     */
+    fun bindLifecycle(lifecycle: Lifecycle, bindEvent: Lifecycle.Event) =
+        LifecycleDisposer(this, lifecycle, bindEvent)
+
+    /**
      * 开始事件监听，可以用于进度弹框、开始与结束按钮状态转换场景，与 doEnd 事件结合使用
      */
     fun doStart(block: () -> Unit): Disposer<T> =
@@ -61,5 +66,5 @@ abstract class Disposer<T> {
     /**
      * 订阅，开始传递事件
      */
-    fun subscribe(accepter: Accepter<T>) = apply { transmit(accepter) }
+    fun subscribe(accepter: Accepter<T>) = apply { transmit(SubscribeAccepter(accepter)) }
 }

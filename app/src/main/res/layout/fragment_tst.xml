@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".TstFragment">
+    android:layout_height="match_parent">
 
     <EditText
         android:id="@+id/text_et"
@@ -14,6 +13,7 @@
         android:layout_marginRight="20dp"
         android:hint="请输入需要翻译的文本"
         android:maxLines="10"
+        android:text="Hello Tube!"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

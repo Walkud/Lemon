@@ -29,4 +29,11 @@ abstract class AbstractEventActionAccepter<T, R>(protected val accepter: Accepte
     override fun onError(throwable: Throwable) {
         accepter.onError(throwable)
     }
+
+    /**
+     * 取消事件
+     */
+    override fun onCancel() {
+        accepter.onCancel()
+    }
 }

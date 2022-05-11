@@ -4,7 +4,10 @@ import com.tube.http.BuildConfig
 import com.tube.http.Tube
 import com.tube.http.api.TstApiService
 import com.tube.http.api.WeatherApiService
+import com.tube.http.api.disposer.TstDisposerApiService
+import com.tube.http.api.disposer.WeatherDisposerApiService
 import com.tube.http.client.TubeClient
+import com.tube.http.disposer.adapter.DisposerApiAdapterFactory
 import com.tube.http.factory.GsonConverterFactory
 import com.tube.http.interceptor.Interceptor
 import com.tube.http.log.TubeLogInterceptor
@@ -17,6 +20,7 @@ object Net {
     private val tube = Tube.build {
         setApiUrl("https://api.btstu.cn")
         addConverterFactory(GsonConverterFactory())
+        addApiAdapterFactory(DisposerApiAdapterFactory())
         addInterceptor(object : Interceptor {
             override fun intercept(chain: Interceptor.Chain): Response {
                 val request = chain.request()
@@ -38,4 +42,8 @@ object Net {
     fun getTstApiService() = tube.create(TstApiService::class.java)
 
     fun getWeatherApiService() = tube.create(WeatherApiService::class.java)
+
+    fun getTstDisposerApiService() = tube.create(TstDisposerApiService::class.java)
+
+    fun getWeatherDisposerApiService() = tube.create(WeatherDisposerApiService::class.java)
 }

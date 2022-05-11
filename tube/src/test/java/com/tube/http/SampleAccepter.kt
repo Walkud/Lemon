@@ -16,4 +16,7 @@ abstract class SampleAccepter<T> : Accepter<T> {
     override fun onError(throwable: Throwable) {
         throwable.printStackTrace()
     }
+
+    override fun onCancel() {
+    }
 }

@@ -155,6 +155,10 @@ class KotlinUnitTest {
                 override fun onError(throwable: Throwable) {
                     println("Accepter onError call :${throwable.message}")
                 }
+
+                override fun onCancel() {
+                    println("Accepter onCancel call")
+                }
             })
     }
 

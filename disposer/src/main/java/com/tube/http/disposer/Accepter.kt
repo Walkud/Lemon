@@ -26,4 +26,9 @@ interface Accepter<T> {
      * 异常错误事件
      */
     fun onError(throwable: Throwable)
+
+    /**
+     * 取消事件
+     */
+    fun onCancel()
 }

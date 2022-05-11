@@ -15,5 +15,5 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navGraph="@navigation/view_model_nav_graph" />
+        app:navGraph="@navigation/disposer_nav_graph" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,7 +12,10 @@ class EventActionDisposer<T>(
     private var action: EventAction?
 ) : Disposer<T>() {
 
+    private var accepter: Accepter<T>? = null
+
     override fun transmit(accepter: Accepter<T>) {
+        this.accepter = accepter
         disposer?.transmit(EventActionAccepter(accepter, action))
     }
 
@@ -88,6 +91,8 @@ class EventActionDisposer<T>(
     override fun cancel() {
         disposer?.cancel()
         disposer = null
+        accepter?.onCancel()
+        accepter = null
         action = null
     }
 }
