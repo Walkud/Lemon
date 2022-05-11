@@ -9,6 +9,7 @@ import com.tube.http.request.body.ResponseBody
 import com.tube.http.toURL
 import com.tube.http.tryClose
 import java.io.IOException
+import java.io.InputStream
 import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
@@ -52,6 +53,7 @@ class TubeClient private constructor(
         val connection = openConnection(request)
 
         var ops: OutputStream? = null
+        var inps: InputStream? = null
 
         try {
 
@@ -80,6 +82,7 @@ class TubeClient private constructor(
             val code = connection.responseCode
             val headers = parseResponseHeaders(connection)
             var body: ResponseBody? = null
+            inps = connection.inputStream
 
             if (code in 200..299) {
                 body = if (code in 204..205) {
@@ -101,6 +104,7 @@ class TubeClient private constructor(
         } catch (e: IOException) {
             throw HttpException.create("Execute request exception to ${request.url}", e)
         } finally {
+            inps?.tryClose()
             ops?.tryClose()
             connection.disconnect()
         }
