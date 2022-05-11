@@ -16,12 +16,10 @@ class EventActionDisposer<T>(
         disposer?.transmit(EventActionAccepter(accepter, action))
     }
 
-    override fun onlyCall() = apply { disposer?.onlyCall() }
-
     /**
      * 事件行为事件接收器，用于分发 doStart、doEnd、doError 事件
      */
-    class EventActionAccepter<T>(
+    private class EventActionAccepter<T>(
         accepter: Accepter<T>,
         private val action: EventAction?
     ) : AbstractEventActionAccepter<T, T>(accepter) {

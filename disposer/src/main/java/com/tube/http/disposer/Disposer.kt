@@ -25,11 +25,6 @@ abstract class Disposer<T> {
     internal abstract fun transmit(accepter: Accepter<T>)
 
     /**
-     * 仅传递 Call 事件，在 Convert 场景会被调用
-     */
-    internal abstract fun onlyCall(): Disposer<T>
-
-    /**
      * 取消事件传递
      */
     abstract fun cancel()

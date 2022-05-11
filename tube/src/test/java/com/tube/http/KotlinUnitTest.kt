@@ -117,10 +117,15 @@ class KotlinUnitTest {
         Disposer.create("10")
             .convert(object : ConvertTransformer<String, Int> {
                 override fun convert(result: String): Disposer<Int> {
-                    return Disposer.create(result.toInt() / 0)//除以0抛出异常
-                        .doStart { println("convert doStart call") }//convert 中添加无效
-                        .doEnd { println("convert doEnd call") }//convert 中添加无效
-                        .doError { println("convert doError call :${it.message}") }//convert 中添加无效
+                    return Disposer.create(result.toInt() * 10)
+                        .doStart { println("convert doStart call") }
+                        .doEnd { println("convert doEnd call") }
+                        .doError { println("convert doError call :${it.message}") }
+//                        .convert(object : ConvertTransformer<Int, Int> { //模拟异常
+//                            override fun convert(result: Int): Disposer<Int> {
+//                                return Disposer.create(result / 0)
+//                            }
+//                        })
                 }
             })
             .warp(object : WarpTransformer<Int, Int> {
@@ -140,15 +145,15 @@ class KotlinUnitTest {
                 }
 
                 override fun onStart() {
-                    println("Accepter onStart")
+                    println("Accepter onStart call")
                 }
 
                 override fun onEnd() {
-                    println("Accepter onEnd")
+                    println("Accepter onEnd call")
                 }
 
                 override fun onError(throwable: Throwable) {
-                    println("Accepter onError")
+                    println("Accepter onError call :${throwable.message}")
                 }
             })
     }

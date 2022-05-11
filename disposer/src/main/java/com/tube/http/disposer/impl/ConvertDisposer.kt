@@ -17,8 +17,6 @@ class ConvertDisposer<T, R>(
         disposer?.transmit(ConvertAccepter(accepter, transformer))
     }
 
-    override fun onlyCall() = apply { disposer?.onlyCall() }
-
     /**
      * 事件转换接收器
      * 1、接收到事件 T
@@ -33,9 +31,29 @@ class ConvertDisposer<T, R>(
         override fun call(result: T) {
             transformer?.let {
                 it.convert(result)
-                    .onlyCall()
-                    .transmit(accepter)
+                    .transmit(EventActionAdapterAccepter(accepter))
             }
+        }
+    }
+
+    /**
+     * 事件行为传递过滤适配接收器
+     * 事件转换后触发的事件行为过滤掉 onStart 和 onEnd 事件，仅向下层传递 onError 事件。
+     */
+    private class EventActionAdapterAccepter<R>(accepter: Accepter<R>) :
+        AbstractEventActionAccepter<R, R>(accepter) {
+        override fun call(result: R) {
+            accepter.call(result)
+        }
+
+        override fun onStart() {
+        }
+
+        override fun onEnd() {
+        }
+
+        override fun onError(throwable: Throwable) {
+            accepter.onError(throwable)
         }
     }
 

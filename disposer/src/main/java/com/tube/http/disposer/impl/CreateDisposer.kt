@@ -11,16 +11,10 @@ import com.tube.http.disposer.Disposer
 class CreateDisposer<T>(private val value: T) : Disposer<T>() {
 
     /**
-     * 是否仅传递 call 事件，不传递事件行为(开始、错误、结束)
-     */
-    private var onlyCall = false
-
-    /**
      * 是否取消
      */
     private var cancel = false
 
-    override fun onlyCall() = apply { onlyCall = true }
     /**
      * 设置仅传递 call 事件 (仅内部使用)
      * 当该实例为非事件源头时需调用此方法，如未调用则可能出现多次触发传递事件行为
@@ -32,17 +26,13 @@ class CreateDisposer<T>(private val value: T) : Disposer<T>() {
             return
         }
 
-        if (onlyCall) {
+        try {
+            accepter.onStart()
             accepter.call(value)
-        } else {
-            try {
-                accepter.onStart()
-                accepter.call(value)
-            } catch (t: Throwable) {
-                accepter.onError(t)
-            } finally {
-                accepter.onEnd()
-            }
+        } catch (t: Throwable) {
+            accepter.onError(t)
+        } finally {
+            accepter.onEnd()
         }
     }
 
