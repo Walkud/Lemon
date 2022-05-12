@@ -1,7 +1,6 @@
 package com.tube.http.use.disposer
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,13 +11,13 @@ import com.google.gson.Gson
 import com.tube.http.R
 import com.tube.http.bean.TstResult
 import com.tube.http.databinding.FragmentTstBinding
+import com.tube.http.disposer.Accepter
 import com.tube.http.disposer.Disposer
 import com.tube.http.disposer.transformer.ConvertTransformer
 import com.tube.http.disposer.transformer.WarpTransformer
 import com.tube.http.net.Net
 import com.tube.http.use.BaseFragment
 import com.tube.http.util.MLog
-import kotlinx.coroutines.*
 import kotlin.concurrent.thread
 
 /**
@@ -88,6 +87,56 @@ class TstDisposerFragment : BaseFragment() {
             } else {
                 Toast.makeText(requireContext(), "翻译的文本不能为空!", Toast.LENGTH_SHORT).show()
             }
+        }
+        binding.testDeaBtn.setOnClickListener {
+            testEventAciton()
+        }
+    }
+
+    private fun testEventAciton() {
+        thread {
+            Disposer.create("10")
+                .convert(object : ConvertTransformer<String, Int> {
+                    override fun convert(result: String): Disposer<Int> {
+                        return Disposer.create(result.toInt() * 10)
+                            .doStart { MLog.d("convert doStart call") }
+                            .doEnd { MLog.d("convert doEnd call:$it") }
+                            .doError { MLog.d("convert doError call :${it.message}") }
+//                        .convert(object : ConvertTransformer<Int, Int> { //模拟异常
+//                            override fun convert(result: Int): Disposer<Int> {
+//                                return Disposer.create(result / 0)
+//                            }
+//                        })
+                    }
+                })
+                .warp(object : WarpTransformer<Int, Int> {
+                    override fun transform(disposer: Disposer<Int>): Disposer<Int> {
+                        return disposer
+                            .doStart { MLog.d("warp doStart call") }
+                            .doEnd { MLog.d("warp doEnd call:$it") }
+                            .doError { MLog.d("warp doError call :${it.message}") }
+                    }
+                })
+                .doStart { MLog.d("doStart call") }
+                .doEnd { MLog.d("doEnd call:$it") }
+                .doError { MLog.d("doError call :${it.message}") }
+                .subscribe(object : Accepter<Int> {
+                    override fun call(result: Int) {
+                        MLog.d(result.toString())
+                    }
+
+                    override fun onStart() {
+                        MLog.d("Accepter onStart call")
+                    }
+
+                    override fun onEnd(endState: Accepter.EndState) {
+                        MLog.d("Accepter onEnd call:$endState")
+                    }
+
+                    override fun onError(throwable: Throwable) {
+                        println("Accepter onError call :${throwable.message}")
+                    }
+                })
         }
     }
 

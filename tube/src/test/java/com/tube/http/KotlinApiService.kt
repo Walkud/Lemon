@@ -22,30 +22,30 @@ interface KotlinApiService {
         headers = ["X-CALL-ID:call123", "X-Token:token123456"],
         isMultipart = true
     )
-    fun getServerTime(): Disposer<BaseResult<ServerTime>>
+    fun getServerTime(): BaseResult<ServerTime>
 
     @Api("commitClientTime?createTime=10002345", method = HttpMethod.GET)
-    fun commitClientTime(@ApiField("time") time: Long): Disposer<BaseResult<Void>>
+    fun commitClientTime(@ApiField("time") time: Long): BaseResult<Void>
 
     @Api("post/{queryKey}")
-    fun postQuery(@ApiPath("queryKey") path: String): Disposer<BaseResult<List<Item>>>
+    fun postQuery(@ApiPath("queryKey") path: String): BaseResult<List<Item>>
 
     @Api("post/query", headers = ["X-Token:token123456"])
     fun postQuery(
         @ApiField("type") type: String,
         @ApiField("page") page: Int,
         @ApiField("pageSize") pageSize: Int
-    ): Disposer<BaseResult<List<Item>>>
+    ): BaseResult<List<Item>>
 
     @Api("post/query", headers = ["X-Token:token123456"])
     fun postQuery(
         @ApiHeader("X-CALL-TIME") callTime: Long,
         @ApiHeader headers: Map<String, Any>,
         @ApiField params: Map<String, Any>
-    ): Disposer<BaseResult<List<Item>>>
+    ): BaseResult<List<Item>>
 
     @Api("post/body")
-    fun postBody(@ApiBody reqBody: ReqBody): Disposer<BaseResult<Void>>
+    fun postBody(@ApiBody reqBody: ReqBody): BaseResult<Void>
 
     @Api("post/part", isMultipart = true)
     fun postPartBody(

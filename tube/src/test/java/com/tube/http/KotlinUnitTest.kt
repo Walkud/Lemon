@@ -49,37 +49,6 @@ class KotlinUnitTest {
     }
 
     @Test
-    fun testQueryServerTime() {
-        val httpService = tube.create<KotlinApiService>()
-        httpService.getServerTime()
-            .subscribe(object : SampleAccepter<BaseResult<ServerTime>>() {
-                override fun call(result: BaseResult<ServerTime>) {
-                    if (result.isSuccess()) {
-                        println("serverTime:${result.data.time}")
-                    } else {
-                        print("serverError:${result.msg}")
-                    }
-                }
-            })
-    }
-
-    @Test
-    fun testCommitClientTime() {
-        val httpService = tube.create<KotlinApiService>()
-        httpService.commitClientTime(System.currentTimeMillis())
-            .subscribe(object : SampleAccepter<BaseResult<Void>>() {
-                override fun call(result: BaseResult<Void>) {
-                    if (result.isSuccess()) {
-                        println("commitClientTime code:${result.code},msg:${result.msg}")
-                    } else {
-                        print("serverError:${result.msg}")
-                    }
-                }
-            })
-    }
-
-
-    @Test
     fun testContentTypeParse() {
         val contentType = "application/json;charset=utf-8;"
         val typeReg = "([a-zA-Z0-9-!#$%&'*+.^_`{|}~]+)"
@@ -113,99 +82,66 @@ class KotlinUnitTest {
     }
 
     @Test
-    fun testDisposerCreate() {
-        Disposer.create("10")
-            .convert(object : ConvertTransformer<String, Int> {
-                override fun convert(result: String): Disposer<Int> {
-                    return Disposer.create(result.toInt() * 10)
-                        .doStart { println("convert doStart call") }
-                        .doEnd { println("convert doEnd call") }
-                        .doError { println("convert doError call :${it.message}") }
-//                        .convert(object : ConvertTransformer<Int, Int> { //模拟异常
-//                            override fun convert(result: Int): Disposer<Int> {
-//                                return Disposer.create(result / 0)
-//                            }
-//                        })
-                }
-            })
-            .warp(object : WarpTransformer<Int, Int> {
-                override fun transform(disposer: Disposer<Int>): Disposer<Int> {
-                    return disposer
-                        .doStart { println("warp doStart call") }
-                        .doEnd { println("warp doEnd call") }
-                        .doError { println("warp doError call :${it.message}") }
-                }
-            })
-            .doStart { println("doStart call") }
-            .doEnd { println("doEnd call") }
-            .doError { println("doError call :${it.message}") }
-            .subscribe(object : Accepter<Int> {
-                override fun call(result: Int) {
-                    println(result)
-                }
+    fun testQueryServerTime() {
+        val httpService = tube.create<KotlinApiService>()
+        val result = httpService.getServerTime()
+        if (result.isSuccess()) {
+            println("serverTime:${result.data.time}")
+        } else {
+            print("serverError:${result.msg}")
+        }
+    }
 
-                override fun onStart() {
-                    println("Accepter onStart call")
-                }
-
-                override fun onEnd(endState: Accepter.EndState) {
-                    println("Accepter onEnd call")
-                }
-
-                override fun onError(throwable: Throwable) {
-                    println("Accepter onError call :${throwable.message}")
-                }
-            })
+    @Test
+    fun testCommitClientTime() {
+        val httpService = tube.create<KotlinApiService>()
+        val result = httpService.commitClientTime(System.currentTimeMillis())
+        if (result.isSuccess()) {
+            println("commitClientTime code:${result.code},msg:${result.msg}")
+        } else {
+            print("serverError:${result.msg}")
+        }
     }
 
     @Test
     fun testPostQuery() {
-        val httpService = tube.create<KotlinApiService>()
-//        httpService.postQuery("testType",1,10)
-        val callTime = System.currentTimeMillis()
-        httpService.postQuery(
-            callTime,
-            mapOf(
-                "X-SDK-VERSION-NAME" to BuildConfig.VERSION_NAME,
-                "X-SDK-VERSION-CODE" to BuildConfig.VERSION_CODE,
-            ),
-            mapOf("type" to "testType", "page" to 1, "pageSize" to 10)
-        ).subscribe(object : SampleAccepter<BaseResult<List<Item>>>() {
-            override fun call(result: BaseResult<List<Item>>) {
-                if (result.isSuccess()) {
-                    val sb = StringBuilder()
-                    for (datum in result.data) {
-                        if (sb.isNotEmpty()) {
-                            sb.append(",")
-                        }
-                        sb.append(datum.id)
+        try {
+            val httpService = tube.create<KotlinApiService>()
+            val callTime = System.currentTimeMillis()
+            val result = httpService.postQuery(
+                callTime,
+                mapOf(
+                    "X-SDK-VERSION-NAME" to BuildConfig.VERSION_NAME,
+                    "X-SDK-VERSION-CODE" to BuildConfig.VERSION_CODE,
+                ),
+                mapOf("type" to "testType", "page" to 1, "pageSize" to 10)
+            )
+            if (result.isSuccess()) {
+                val sb = StringBuilder()
+                for (datum in result.data) {
+                    if (sb.isNotEmpty()) {
+                        sb.append(",")
                     }
-                    println("Item ids:$sb")
-                } else {
-                    println("ServerMsg:${result.msg}")
+                    sb.append(datum.id)
                 }
+                println("Item ids:$sb")
+            } else {
+                println("ServerMsg Fail! ServerMsg:${result.msg}")
             }
-
-            override fun onError(throwable: Throwable) {
-                super.onError(throwable)
-                println("postQuery error!")
-            }
-        })
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     @Test
     fun testPostBody() {
         val httpService = tube.create<KotlinApiService>()
-        httpService.postBody(ReqBody(1, "call data info"))
-            .subscribe(object : SampleAccepter<BaseResult<Void>>() {
-                override fun call(result: BaseResult<Void>) {
-                    if (result.isSuccess()) {
-                        println("postBody Sccuess")
-                    } else {
-                        println("postBody Fail")
-                    }
-                }
-            })
+        val result = httpService.postBody(ReqBody(1, "call data info"))
+        if (result.isSuccess()) {
+            println("postBody Sccuess")
+        } else {
+            println("ServerMsg Fail! ServerMsg:${result.msg}")
+        }
     }
 
     @Test
@@ -238,16 +174,5 @@ class KotlinUnitTest {
         } catch (t: Throwable) {
             t.printStackTrace()
         }
-
-//        httpService.postPartBody(123, "Part msg!", file, part, contentRequestBody, partMap)
-//            .subscribe(object : SampleAccepter<BaseResult<Void>>() {
-//                override fun call(result: BaseResult<Void>) {
-//                    if (result.isSuccess()) {
-//                        println("postPartBody code:${result.code},msg:${result.msg}")
-//                    } else {
-//                        print("serverError:${result.msg}")
-//                    }
-//                }
-//            })
     }
 }
