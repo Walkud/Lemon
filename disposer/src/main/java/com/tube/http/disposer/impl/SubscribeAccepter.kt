@@ -1,22 +1,31 @@
 package com.tube.http.disposer.impl
 
 import com.tube.http.disposer.Accepter
+import com.tube.http.disposer.utils.UiUtil
 
 internal class SubscribeAccepter<T>(private var accepter: Accepter<T>?) : Accepter<T> {
     override fun onStart() {
-        accepter?.onStart()
+        UiUtil.runUiThread {
+            accepter?.onStart()
+        }
     }
 
     override fun call(result: T) {
-        accepter?.call(result)
+        UiUtil.runUiThread {
+            accepter?.call(result)
+        }
     }
 
     override fun onEnd(endState: Accepter.EndState) {
-        accepter?.onEnd(endState)
-        accepter = null
+        UiUtil.runUiThread {
+            accepter?.onEnd(endState)
+            accepter = null
+        }
     }
 
     override fun onError(throwable: Throwable) {
-        accepter?.onError(throwable)
+        UiUtil.runUiThread {
+            accepter?.onError(throwable)
+        }
     }
 }

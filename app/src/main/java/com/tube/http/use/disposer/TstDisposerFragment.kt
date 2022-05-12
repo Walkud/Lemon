@@ -13,6 +13,7 @@ import com.tube.http.bean.TstResult
 import com.tube.http.databinding.FragmentTstBinding
 import com.tube.http.disposer.Accepter
 import com.tube.http.disposer.Disposer
+import com.tube.http.disposer.scheduler.Scheduler
 import com.tube.http.disposer.transformer.ConvertTransformer
 import com.tube.http.disposer.transformer.WarpTransformer
 import com.tube.http.net.Net
@@ -50,40 +51,33 @@ class TstDisposerFragment : BaseFragment() {
         binding.queryBtn.setOnClickListener {
             val text = binding.textEt.text.toString()
             if (text.isNotEmpty()) {
-                thread {
-                    Net.getTstDisposerApiService().languageTranslation(text)
-                        .convert(object : ConvertTransformer<TstResult, TstResult> {
-                            override fun convert(result: TstResult): Disposer<TstResult> {
-                                Thread.sleep(5000)
-                                return Disposer.create(result)
+                Net.getTstDisposerApiService().languageTranslation(text)
+                    .doEnd {
+                        MLog.d("bindLifecycle Up doEnd call:$it")
+                    }
+                    .disposerOn(Scheduler.io())
+                    .bindLifecycle(lifecycle, Lifecycle.Event.ON_DESTROY)
+                    .doStart {
+                        MLog.d("doStart call")
+                        progressDialog.show()
+                    }
+                    .doEnd {
+                        MLog.d("doEnd call:$it")
+                        progressDialog.dismiss()
+                    }
+                    .subscribe(object : SimpleAccepter<TstResult>() {
+                        override fun call(result: TstResult) {
+                            super.call(result)
+                            requireActivity().runOnUiThread {
+                                binding.resultTv.text = Gson().toJson(result)
                             }
-                        })
-                        .doEnd {
-                            MLog.d("bindLifecycle Up doEnd call:$it")
                         }
-                        .bindLifecycle(lifecycle, Lifecycle.Event.ON_DESTROY)
-                        .doStart {
-                            MLog.d("doStart call")
-                            progressDialog.show()
-                        }
-                        .doEnd {
-                            MLog.d("doEnd call:$it")
-                            progressDialog.dismiss()
-                        }
-                        .subscribe(object : SimpleAccepter<TstResult>() {
-                            override fun call(result: TstResult) {
-                                super.call(result)
-                                requireActivity().runOnUiThread {
-                                    binding.resultTv.text = Gson().toJson(result)
-                                }
-                            }
 
-                            override fun onError(throwable: Throwable) {
-                                super.onError(throwable)
-                                binding.resultTv.text = "语言翻译异常：${throwable.message}"
-                            }
-                        })
-                }
+                        override fun onError(throwable: Throwable) {
+                            super.onError(throwable)
+                            binding.resultTv.text = "语言翻译异常：${throwable.message}"
+                        }
+                    })
             } else {
                 Toast.makeText(requireContext(), "翻译的文本不能为空!", Toast.LENGTH_SHORT).show()
             }

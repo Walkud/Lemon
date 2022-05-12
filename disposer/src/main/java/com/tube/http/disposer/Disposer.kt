@@ -2,6 +2,7 @@ package com.tube.http.disposer
 
 import androidx.lifecycle.Lifecycle
 import com.tube.http.disposer.impl.*
+import com.tube.http.disposer.scheduler.Scheduler
 import com.tube.http.disposer.transformer.ConvertTransformer
 import com.tube.http.disposer.transformer.WarpTransformer
 
@@ -44,6 +45,11 @@ abstract class Disposer<T> {
      */
     fun bindLifecycle(lifecycle: Lifecycle, bindEvent: Lifecycle.Event) =
         LifecycleDisposer(this, lifecycle, bindEvent)
+
+    /**
+     * 处理器执行调度
+     */
+    fun disposerOn(scheduler: Scheduler) = SchedulerDisposer(this, scheduler)
 
     /**
      * 开始事件监听，可以用于进度弹框、开始与结束按钮状态转换场景，与 doEnd 事件结合使用，UI 线程中回调
