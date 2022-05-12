@@ -1,31 +1,23 @@
 package com.tube.http.use.disposer
 
-import android.util.Log
 import com.tube.http.disposer.Accepter
+import com.tube.http.util.MLog
 
 open class SimpleAccepter<T> : Accepter<T> {
 
-    companion object {
-        private val TAG = SimpleAccepter::class.java.simpleName
-    }
-
     override fun onStart() {
-        Log.d(TAG, "onStart")
+        MLog.d("onStart")
     }
 
     override fun call(result: T) {
-        Log.d(TAG, "call:$result")
+        MLog.d("call:$result")
     }
 
-    override fun onEnd() {
-        Log.d(TAG, "onEnd")
+    override fun onEnd(endState: Accepter.EndState) {
+        MLog.d("onEnd:$endState")
     }
 
     override fun onError(throwable: Throwable) {
-        Log.d(TAG, "onError:${throwable.message}")
-    }
-
-    override fun onCancel() {
-        Log.d(TAG, "onCancel")
+        MLog.d("onError:${throwable.message}")
     }
 }

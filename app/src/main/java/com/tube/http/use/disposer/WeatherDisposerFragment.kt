@@ -13,6 +13,7 @@ import com.tube.http.R
 import com.tube.http.bean.TstResult
 import com.tube.http.bean.WeatherResult
 import com.tube.http.databinding.FragmentWeatherBinding
+import com.tube.http.disposer.Accepter
 import com.tube.http.net.Net
 import com.tube.http.use.BaseFragment
 import kotlinx.coroutines.*
@@ -91,10 +92,7 @@ class WeatherDisposerFragment : BaseFragment() {
                 .subscribe(object : SimpleAccepter<WeatherResult>() {
                     override fun onStart() {
                         super.onStart()
-                        requireActivity().runOnUiThread {
-                            progressDialog.show()
-                        }
-                        Thread.sleep(3000)
+                        progressDialog.show()
                     }
 
                     override fun call(result: WeatherResult) {
@@ -106,16 +104,12 @@ class WeatherDisposerFragment : BaseFragment() {
 
                     override fun onError(throwable: Throwable) {
                         super.onError(throwable)
-                        requireActivity().runOnUiThread {
-                            binding.resultTv.text = "获取城市天气异常：${throwable.message}"
-                        }
+                        binding.resultTv.text = "获取城市天气异常：${throwable.message}"
                     }
 
-                    override fun onEnd() {
-                        super.onEnd()
-                        requireActivity().runOnUiThread {
-                            progressDialog.dismiss()
-                        }
+                    override fun onEnd(endState: Accepter.EndState) {
+                        super.onEnd(endState)
+                        progressDialog.dismiss()
                     }
                 })
         }

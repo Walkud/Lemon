@@ -11,16 +11,12 @@ internal class SubscribeAccepter<T>(private var accepter: Accepter<T>?) : Accept
         accepter?.call(result)
     }
 
-    override fun onEnd() {
-        accepter?.onEnd()
+    override fun onEnd(endState: Accepter.EndState) {
+        accepter?.onEnd(endState)
+        accepter = null
     }
 
     override fun onError(throwable: Throwable) {
         accepter?.onError(throwable)
-    }
-
-    override fun onCancel() {
-        accepter?.onCancel()
-        accepter = null
     }
 }

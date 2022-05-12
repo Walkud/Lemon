@@ -20,7 +20,7 @@ interface Accepter<T> {
      * 结束事件，事件传递完成后触发
      * 注意：当事件传递过程中出现异常后，该方法也会被调用
      */
-    fun onEnd()
+    fun onEnd(endState: EndState)
 
     /**
      * 异常错误事件
@@ -28,7 +28,10 @@ interface Accepter<T> {
     fun onError(throwable: Throwable)
 
     /**
-     * 取消事件
+     * 结束状态
      */
-    fun onCancel()
+    enum class EndState {
+        Normal,//正常结束
+        Cancel;//取消结束
+    }
 }

@@ -148,16 +148,12 @@ class KotlinUnitTest {
                     println("Accepter onStart call")
                 }
 
-                override fun onEnd() {
+                override fun onEnd(endState: Accepter.EndState) {
                     println("Accepter onEnd call")
                 }
 
                 override fun onError(throwable: Throwable) {
                     println("Accepter onError call :${throwable.message}")
-                }
-
-                override fun onCancel() {
-                    println("Accepter onCancel call")
                 }
             })
     }

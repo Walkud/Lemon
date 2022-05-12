@@ -2,6 +2,7 @@ package com.tube.http.disposer.impl
 
 import com.tube.http.disposer.Accepter
 import com.tube.http.disposer.Disposer
+import com.tube.http.disposer.utils.UiUtil
 
 /**
  * Describe:事件行为处理器
@@ -12,10 +13,7 @@ class EventActionDisposer<T>(
     private var action: EventAction?
 ) : Disposer<T>() {
 
-    private var accepter: Accepter<T>? = null
-
     override fun transmit(accepter: Accepter<T>) {
-        this.accepter = accepter
         disposer?.transmit(EventActionAccepter(accepter, action))
     }
 
@@ -39,11 +37,11 @@ class EventActionDisposer<T>(
             }
         }
 
-        override fun onEnd() {
-            super.onEnd()
+        override fun onEnd(endState: Accepter.EndState) {
+            super.onEnd(endState)
             //分发 onEnd 事件
             if (action is EventAction.EndAction) {
-                action.invoke()
+                action.invoke(endState)
             }
         }
 
@@ -61,29 +59,35 @@ class EventActionDisposer<T>(
      */
     sealed class EventAction {
         /**
-         * start 行为
+         * start 行为，UI 线程中回调
          */
         class StartAction(private val block: () -> Unit) : EventAction() {
             fun invoke() {
-                block.invoke()
+                UiUtil.runUiThread {
+                    block.invoke()
+                }
             }
         }
 
         /**
-         * end 行为
+         * end 行为，UI 线程中回调
          */
-        class EndAction(private val block: () -> Unit) : EventAction() {
-            fun invoke() {
-                block.invoke()
+        class EndAction(private val block: (endState: Accepter.EndState) -> Unit) : EventAction() {
+            fun invoke(endState: Accepter.EndState) {
+                UiUtil.runUiThread {
+                    block.invoke(endState)
+                }
             }
         }
 
         /**
-         * 错误行为
+         * 错误行为，UI 线程中回调
          */
         class ErrorAction(private val block: (throwable: Throwable) -> Unit) : EventAction() {
             fun invoke(throwable: Throwable) {
-                block.invoke(throwable)
+                UiUtil.runUiThread {
+                    block.invoke(throwable)
+                }
             }
         }
     }
@@ -91,8 +95,8 @@ class EventActionDisposer<T>(
     override fun cancel() {
         disposer?.cancel()
         disposer = null
-        accepter?.onCancel()
-        accepter = null
+        //分发 onEnd 事件
+        (action as? EventAction.EndAction)?.invoke(Accepter.EndState.Cancel)
         action = null
     }
 }

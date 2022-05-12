@@ -19,8 +19,8 @@ abstract class AbstractEventActionAccepter<T, R>(protected val accepter: Accepte
     /**
      * 结束事件
      */
-    override fun onEnd() {
-        accepter.onEnd()
+    override fun onEnd(endState: Accepter.EndState) {
+        accepter.onEnd(endState)
     }
 
     /**
@@ -28,12 +28,5 @@ abstract class AbstractEventActionAccepter<T, R>(protected val accepter: Accepte
      */
     override fun onError(throwable: Throwable) {
         accepter.onError(throwable)
-    }
-
-    /**
-     * 取消事件
-     */
-    override fun onCancel() {
-        accepter.onCancel()
     }
 }

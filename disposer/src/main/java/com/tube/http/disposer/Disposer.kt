@@ -46,25 +46,25 @@ abstract class Disposer<T> {
         LifecycleDisposer(this, lifecycle, bindEvent)
 
     /**
-     * 开始事件监听，可以用于进度弹框、开始与结束按钮状态转换场景，与 doEnd 事件结合使用
+     * 开始事件监听，可以用于进度弹框、开始与结束按钮状态转换场景，与 doEnd 事件结合使用，UI 线程中回调
      */
     fun doStart(block: () -> Unit): Disposer<T> =
         EventActionDisposer(this, EventActionDisposer.EventAction.StartAction(block))
 
     /**
-     * 错误事件监听
+     * 错误事件监听，UI 线程中回调
      */
     fun doError(block: (throwable: Throwable) -> Unit): Disposer<T> =
         EventActionDisposer(this, EventActionDisposer.EventAction.ErrorAction(block))
 
     /**
-     * 完成事件监听，可以用于进度弹框、开始与结束按钮状态转换场景，与 doStart 事件结合使用
+     * 完成事件监听，可以用于进度弹框、开始与结束按钮状态转换场景，与 doStart 事件结合使用，UI 线程中回调
      */
-    fun doEnd(block: () -> Unit): Disposer<T> =
+    fun doEnd(block: (endState: Accepter.EndState) -> Unit): Disposer<T> =
         EventActionDisposer(this, EventActionDisposer.EventAction.EndAction(block))
 
     /**
      * 订阅，开始传递事件
      */
-    fun subscribe(accepter: Accepter<T>) = apply { transmit(SubscribeAccepter(accepter)) }
+    fun subscribe(accepter: Accepter<T>) = transmit(SubscribeAccepter(accepter))
 }

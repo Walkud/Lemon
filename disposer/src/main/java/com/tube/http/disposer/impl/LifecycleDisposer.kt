@@ -9,59 +9,90 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
 import com.tube.http.disposer.Accepter
 import com.tube.http.disposer.Disposer
+import com.tube.http.disposer.utils.UiUtil
 
+/**
+ * UI 生命周期处理器
+ */
 class LifecycleDisposer<T>(
     private var disposer: Disposer<T>?,
-    lifecycle: Lifecycle,
+    private var lifecycle: Lifecycle?,
     bindEvent: Lifecycle.Event
 ) : Disposer<T>() {
 
-    private val lifecycleObserver = UiLifecycleObserver(this, lifecycle, bindEvent)
-    private var accepter: Accepter<T>? = null
+    private val lifecycleObserver = UiLifecycleObserver(this, bindEvent)
+    private var lifecycleAccepter: LifecycleAccepter<T>? = null
 
     init {
-        if (Looper.getMainLooper() == Looper.myLooper()) {
-            lifecycle.addObserver(lifecycleObserver)
-        } else {
-            val handler = Handler(Looper.getMainLooper())
-            handler.post {
-                disposer?.let {
-                    lifecycle.addObserver(lifecycleObserver)
-                }
+        UiUtil.runUiThread {
+            //添加 UI 生命周期监听
+            lifecycle?.addObserver(lifecycleObserver)
+        }
+    }
+
+
+    override fun transmit(accepter: Accepter<T>) {
+        this.lifecycleAccepter = LifecycleAccepter(accepter)
+        lifecycleAccepter?.let {
+            disposer?.transmit(it)
+        }
+    }
+
+    /**
+     * 取消操作
+     * 1、移除 UI 生命周期监听
+     * 2、调用接收器结束事件(取消状态)
+     * 3、传递取消事件
+     */
+    override fun cancel() {
+        removeObserver()
+        lifecycleAccepter?.onEnd(Accepter.EndState.Cancel)
+        lifecycleAccepter = null
+        disposer?.cancel()
+        disposer = null
+    }
+
+    /**
+     * 移除 UI 生命周期监听
+     */
+    private fun removeObserver() {
+        UiUtil.runUiThread {
+            Log.d("LifecycleDisposer", "removeObserver")
+            lifecycle?.removeObserver(lifecycleObserver)
+            lifecycle = null
+        }
+    }
+
+    /**
+     * 事件传递结束事件接收器，用于移除 UI 生命周期监听
+     */
+    private inner class LifecycleAccepter<T>(accepter: Accepter<T>) :
+        AbstractEventActionAccepter<T, T>(accepter) {
+        override fun call(result: T) {
+            accepter.call(result)
+        }
+
+        override fun onEnd(endState: Accepter.EndState) {
+            super.onEnd(endState)
+            if (endState == Accepter.EndState.Normal) {
+                removeObserver()
             }
         }
     }
 
-    override fun transmit(accepter: Accepter<T>) {
-        this.accepter = accepter
-        disposer?.transmit(accepter)
-    }
-
-    override fun cancel() {
-        disposer?.cancel()
-        disposer = null
-        accepter?.onCancel()
-        accepter = null
-    }
-
+    /**
+     * UI 生命周期观察者
+     */
     private class UiLifecycleObserver<T>(
         private var lifecycleDisposer: LifecycleDisposer<T>?,
-        private var lifecycle: Lifecycle?,
         private val bindEvent: Lifecycle.Event
     ) : LifecycleObserver {
 
         @OnLifecycleEvent(Lifecycle.Event.ON_ANY)
         fun eventOnChange(owner: LifecycleOwner, event: Lifecycle.Event) {
-            Log.d(
-                "LifecycleDisposer",
-                "eventOnChange:$event,bindEvent:$bindEvent,isMainThread:${Looper.getMainLooper() == Looper.myLooper()}"
-            )
             if (event == bindEvent) {
-                Log.d("LifecycleDisposer", "lifecycleDisposer call cancel")
                 lifecycleDisposer?.cancel()
                 lifecycleDisposer = null
-                lifecycle?.removeObserver(this)
-                lifecycle = null
             }
         }
     }

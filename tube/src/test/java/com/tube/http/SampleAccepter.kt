@@ -10,13 +10,10 @@ abstract class SampleAccepter<T> : Accepter<T> {
     override fun onStart() {
     }
 
-    override fun onEnd() {
+    override fun onEnd(endState: Accepter.EndState) {
     }
 
     override fun onError(throwable: Throwable) {
         throwable.printStackTrace()
-    }
-
-    override fun onCancel() {
     }
 }

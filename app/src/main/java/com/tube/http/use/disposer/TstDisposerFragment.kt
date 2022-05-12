@@ -1,6 +1,7 @@
 package com.tube.http.use.disposer
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +13,11 @@ import com.tube.http.R
 import com.tube.http.bean.TstResult
 import com.tube.http.databinding.FragmentTstBinding
 import com.tube.http.disposer.Disposer
+import com.tube.http.disposer.transformer.ConvertTransformer
+import com.tube.http.disposer.transformer.WarpTransformer
 import com.tube.http.net.Net
 import com.tube.http.use.BaseFragment
+import com.tube.http.util.MLog
 import kotlinx.coroutines.*
 import kotlin.concurrent.thread
 
@@ -49,16 +53,25 @@ class TstDisposerFragment : BaseFragment() {
             if (text.isNotEmpty()) {
                 thread {
                     Net.getTstDisposerApiService().languageTranslation(text)
-                        .bindLifecycle(lifecycle, Lifecycle.Event.ON_DESTROY)
-                        .subscribe(object : SimpleAccepter<TstResult>() {
-                            override fun onStart() {
-                                super.onStart()
-                                requireActivity().runOnUiThread {
-                                    progressDialog.show()
-                                }
+                        .convert(object : ConvertTransformer<TstResult, TstResult> {
+                            override fun convert(result: TstResult): Disposer<TstResult> {
                                 Thread.sleep(5000)
+                                return Disposer.create(result)
                             }
-
+                        })
+                        .doEnd {
+                            MLog.d("bindLifecycle Up doEnd call:$it")
+                        }
+                        .bindLifecycle(lifecycle, Lifecycle.Event.ON_DESTROY)
+                        .doStart {
+                            MLog.d("doStart call")
+                            progressDialog.show()
+                        }
+                        .doEnd {
+                            MLog.d("doEnd call:$it")
+                            progressDialog.dismiss()
+                        }
+                        .subscribe(object : SimpleAccepter<TstResult>() {
                             override fun call(result: TstResult) {
                                 super.call(result)
                                 requireActivity().runOnUiThread {
@@ -68,24 +81,10 @@ class TstDisposerFragment : BaseFragment() {
 
                             override fun onError(throwable: Throwable) {
                                 super.onError(throwable)
-                                requireActivity().runOnUiThread {
-                                    binding.resultTv.text = "语言翻译异常：${throwable.message}"
-                                }
-                            }
-
-                            override fun onEnd() {
-                                super.onEnd()
-                                requireActivity().runOnUiThread {
-                                    progressDialog.dismiss()
-                                }
+                                binding.resultTv.text = "语言翻译异常：${throwable.message}"
                             }
                         })
                 }
-//                GlobalScope.launch(Dispatchers.IO) {
-//                    delay(3000)
-//                    val a = 100 / 0
-
-//                }
             } else {
                 Toast.makeText(requireContext(), "翻译的文本不能为空!", Toast.LENGTH_SHORT).show()
             }

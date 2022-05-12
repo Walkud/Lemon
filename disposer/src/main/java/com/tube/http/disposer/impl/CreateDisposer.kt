@@ -32,7 +32,9 @@ class CreateDisposer<T>(private val value: T) : Disposer<T>() {
         } catch (t: Throwable) {
             accepter.onError(t)
         } finally {
-            accepter.onEnd()
+            if (!cancel) {
+                accepter.onEnd(Accepter.EndState.Normal)
+            }
         }
     }
 
