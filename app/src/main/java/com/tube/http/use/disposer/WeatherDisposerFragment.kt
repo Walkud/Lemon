@@ -6,18 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.tube.http.R
-import com.tube.http.bean.TstResult
 import com.tube.http.bean.WeatherResult
 import com.tube.http.databinding.FragmentWeatherBinding
-import com.tube.http.disposer.Accepter
 import com.tube.http.net.Net
 import com.tube.http.use.BaseFragment
 import kotlinx.coroutines.*
-import kotlin.concurrent.thread
 
 /**
  * 简单使用示例 城市天气预报 Fragment
