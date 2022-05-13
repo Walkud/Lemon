@@ -1,7 +1,5 @@
 package com.tube.http.disposer.impl
 
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
