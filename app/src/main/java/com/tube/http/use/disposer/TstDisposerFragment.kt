@@ -12,10 +12,10 @@ import com.tube.http.bean.TstResult
 import com.tube.http.databinding.FragmentTstBinding
 import com.tube.http.disposer.Accepter
 import com.tube.http.disposer.Disposer
+import com.tube.http.disposer.scheduler.Scheduler
 import com.tube.http.net.Net
 import com.tube.http.use.BaseFragment
 import com.tube.http.util.MLog
-import kotlin.concurrent.thread
 
 /**
  * 简单使用示例语言翻译 Fragment
@@ -73,41 +73,42 @@ class TstDisposerFragment : BaseFragment() {
     }
 
     private fun testEventAciton() {
-        thread {
-            Disposer.create("10")
-                .convert { result ->
-                    Disposer.create(result.toInt() * 10)
-                        .doStart { MLog.d("convert doStart call") }
-                        .doEnd { MLog.d("convert doEnd call:$it") }
-                        .doError { MLog.d("convert doError call :${it.message}") }
-                        .convert { Disposer.create(it / 0) }
+        Disposer.create("10")
+            .convert { result ->
+                MLog.d("exce convert")
+                Disposer.create(result.toInt() * 10)
+                    .doStart { MLog.d("convert doStart call") }
+                    .doEnd { MLog.d("convert doEnd call:$it") }
+                    .doError { MLog.d("convert doError call :${it.message}") }
+                    .convert { Disposer.create(it / 0) }
+            }
+            .warp { disposer ->
+                MLog.d("exce warp")
+                disposer.doStart { MLog.d("warp doStart call") }
+                    .doEnd { MLog.d("warp doEnd call:$it") }
+                    .doError { MLog.d("warp doError call :${it.message}") }
+            }
+            .disposerOn(Scheduler.io())
+            .doStart { MLog.d("doStart call") }
+            .doEnd { MLog.d("doEnd call:$it") }
+            .doError { MLog.d("doError call :${it.message}") }
+            .subscribe(object : Accepter<Int> {
+                override fun call(result: Int) {
+                    MLog.d(result.toString())
                 }
-                .warp { disposer ->
-                    disposer.doStart { MLog.d("warp doStart call") }
-                        .doEnd { MLog.d("warp doEnd call:$it") }
-                        .doError { MLog.d("warp doError call :${it.message}") }
+
+                override fun onStart() {
+                    MLog.d("Accepter onStart call")
                 }
-                .doStart { MLog.d("doStart call") }
-                .doEnd { MLog.d("doEnd call:$it") }
-                .doError { MLog.d("doError call :${it.message}") }
-                .subscribe(object : Accepter<Int> {
-                    override fun call(result: Int) {
-                        MLog.d(result.toString())
-                    }
 
-                    override fun onStart() {
-                        MLog.d("Accepter onStart call")
-                    }
+                override fun onEnd(endState: Accepter.EndState) {
+                    MLog.d("Accepter onEnd call:$endState")
+                }
 
-                    override fun onEnd(endState: Accepter.EndState) {
-                        MLog.d("Accepter onEnd call:$endState")
-                    }
-
-                    override fun onError(throwable: Throwable) {
-                        println("Accepter onError call :${throwable.message}")
-                    }
-                })
-        }
+                override fun onError(throwable: Throwable) {
+                    MLog.d("Accepter onError call :${throwable.message}")
+                }
+            })
     }
 
     override fun onDestroyView() {

@@ -30,7 +30,7 @@ abstract class Disposer<T> {
     /**
      * 事件包裹，用于事件处理扩展
      */
-    fun <R> warp(block: (Disposer<T>) -> Disposer<R>): Disposer<R> = block(this)
+    fun <R> warp(block: (Disposer<T>) -> Disposer<R>): Disposer<R> = WarpDisposer(this, block)
 
     /**
      * 事件转换，用于将事件 T 转换为事件 R 场景

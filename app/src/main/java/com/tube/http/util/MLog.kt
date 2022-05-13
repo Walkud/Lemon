@@ -4,12 +4,11 @@ import android.util.Log
 
 class MLog private constructor() {
 
-
     companion object {
         private const val TAG = "Tube"
 
         fun d(msg: String, tag: String = TAG) {
-            Log.d(tag, msg)
+            Log.d(tag, "$msg,thread:${Thread.currentThread()}")
         }
 
         fun e(msg: String, throwable: Throwable? = null, tag: String = TAG) {
