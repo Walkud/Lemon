@@ -3,8 +3,6 @@ package com.tube.http.disposer
 import androidx.lifecycle.Lifecycle
 import com.tube.http.disposer.impl.*
 import com.tube.http.disposer.scheduler.Scheduler
-import com.tube.http.disposer.transformer.ConvertTransformer
-import com.tube.http.disposer.transformer.WarpTransformer
 
 /**
  * Describe: 事件处理器
@@ -32,13 +30,13 @@ abstract class Disposer<T> {
     /**
      * 事件包裹，用于事件处理扩展
      */
-    fun <R> warp(transformer: WarpTransformer<T, R>): Disposer<R> = transformer.transform(this)
+    fun <R> warp(block: (Disposer<T>) -> Disposer<R>): Disposer<R> = block(this)
 
     /**
      * 事件转换，用于将事件 T 转换为事件 R 场景
      * 例如：有 A,B 两个接口，B 接口依赖 A 接口的返回数据，则可以使用该方法
      */
-    fun <R> convert(transformer: ConvertTransformer<T, R>) = ConvertDisposer(this, transformer)
+    fun <R> convert(block: (T) -> Disposer<R>) = ConvertDisposer(this, block)
 
     /**
      * 绑定 UI 生命周期

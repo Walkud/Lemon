@@ -80,15 +80,13 @@ class WeatherViewModelFragment : BaseFragment() {
         }
 
         weatherViewModel.cityWeatherResult.observe(viewLifecycleOwner, Observer {
-            if (progressDialog.isShowing) {
-                progressDialog.dismiss()
-            }
+            progressView.dismiss()
             binding.resultTv.text = it
         })
     }
 
     private fun getCityWeatherInfo() {
-        progressDialog.show()
+        progressView.show()
         weatherViewModel.getCityWeatherInfo(cityCode)
     }
 

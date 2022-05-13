@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.tube.http.R
@@ -13,9 +12,6 @@ import com.tube.http.bean.TstResult
 import com.tube.http.databinding.FragmentTstBinding
 import com.tube.http.disposer.Accepter
 import com.tube.http.disposer.Disposer
-import com.tube.http.disposer.scheduler.Scheduler
-import com.tube.http.disposer.transformer.ConvertTransformer
-import com.tube.http.disposer.transformer.WarpTransformer
 import com.tube.http.net.Net
 import com.tube.http.use.BaseFragment
 import com.tube.http.util.MLog
@@ -55,22 +51,11 @@ class TstDisposerFragment : BaseFragment() {
                     .doEnd {
                         MLog.d("bindLifecycle Up doEnd call:$it")
                     }
-                    .disposerOn(Scheduler.io())
-                    .bindLifecycle(lifecycle, Lifecycle.Event.ON_DESTROY)
-                    .doStart {
-                        MLog.d("doStart call")
-                        progressDialog.show()
-                    }
-                    .doEnd {
-                        MLog.d("doEnd call:$it")
-                        progressDialog.dismiss()
-                    }
+                    .warp { createUiDisposer(progressView, it) }
                     .subscribe(object : SimpleAccepter<TstResult>() {
                         override fun call(result: TstResult) {
                             super.call(result)
-                            requireActivity().runOnUiThread {
-                                binding.resultTv.text = Gson().toJson(result)
-                            }
+                            binding.resultTv.text = Gson().toJson(result)
                         }
 
                         override fun onError(throwable: Throwable) {
@@ -90,27 +75,18 @@ class TstDisposerFragment : BaseFragment() {
     private fun testEventAciton() {
         thread {
             Disposer.create("10")
-                .convert(object : ConvertTransformer<String, Int> {
-                    override fun convert(result: String): Disposer<Int> {
-                        return Disposer.create(result.toInt() * 10)
-                            .doStart { MLog.d("convert doStart call") }
-                            .doEnd { MLog.d("convert doEnd call:$it") }
-                            .doError { MLog.d("convert doError call :${it.message}") }
-//                        .convert(object : ConvertTransformer<Int, Int> { //模拟异常
-//                            override fun convert(result: Int): Disposer<Int> {
-//                                return Disposer.create(result / 0)
-//                            }
-//                        })
-                    }
-                })
-                .warp(object : WarpTransformer<Int, Int> {
-                    override fun transform(disposer: Disposer<Int>): Disposer<Int> {
-                        return disposer
-                            .doStart { MLog.d("warp doStart call") }
-                            .doEnd { MLog.d("warp doEnd call:$it") }
-                            .doError { MLog.d("warp doError call :${it.message}") }
-                    }
-                })
+                .convert { result ->
+                    Disposer.create(result.toInt() * 10)
+                        .doStart { MLog.d("convert doStart call") }
+                        .doEnd { MLog.d("convert doEnd call:$it") }
+                        .doError { MLog.d("convert doError call :${it.message}") }
+                        .convert { Disposer.create(it / 0) }
+                }
+                .warp { disposer ->
+                    disposer.doStart { MLog.d("warp doStart call") }
+                        .doEnd { MLog.d("warp doEnd call:$it") }
+                        .doError { MLog.d("warp doError call :${it.message}") }
+                }
                 .doStart { MLog.d("doStart call") }
                 .doEnd { MLog.d("doEnd call:$it") }
                 .doError { MLog.d("doError call :${it.message}") }

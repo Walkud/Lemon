@@ -81,7 +81,7 @@ class WeatherFragment : BaseFragment(), CoroutineScope by MainScope() {
 
     private fun queryCityWeatherInfo() {
         launch {
-            progressDialog.show()
+            progressView.show()
             binding.resultTv.text = try {
                 val result = withContext(Dispatchers.IO) {
                     val createTime = System.currentTimeMillis()
@@ -92,7 +92,7 @@ class WeatherFragment : BaseFragment(), CoroutineScope by MainScope() {
                 "获取城市天气异常：${e.message}"
             }
 
-            progressDialog.dismiss()
+            progressView.dismiss()
         }
     }
 

@@ -2,7 +2,6 @@ package com.tube.http.disposer.impl
 
 import com.tube.http.disposer.Accepter
 import com.tube.http.disposer.Disposer
-import com.tube.http.disposer.transformer.ConvertTransformer
 
 /**
  * Describe:事件转换处理器
@@ -10,12 +9,18 @@ import com.tube.http.disposer.transformer.ConvertTransformer
  */
 class ConvertDisposer<T, R>(
     private var disposer: Disposer<T>?,
-    private var transformer: ConvertTransformer<T, R>?
+    private var block: ((T) -> Disposer<R>)?
 ) : Disposer<R>() {
 
+    private var convertAccepter: ConvertAccepter<T, R>? = null
 
     override fun transmit(accepter: Accepter<R>) {
-        disposer?.transmit(ConvertAccepter(accepter, transformer))
+        disposer?.let {
+            convertAccepter = ConvertAccepter(accepter, block)
+            convertAccepter?.let { accepter ->
+                it.transmit(accepter)
+            }
+        }
     }
 
     /**
@@ -26,14 +31,15 @@ class ConvertDisposer<T, R>(
      */
     class ConvertAccepter<T, R>(
         accepter: Accepter<R>,
-        private val transformer: ConvertTransformer<T, R>?
+        private var block: ((T) -> Disposer<R>)?
     ) : AbstractEventActionAccepter<T, R>(accepter) {
 
         override fun call(result: T) {
-            transformer?.let {
-                it.convert(result)
-                    .transmit(EventActionAdapterAccepter(accepter))
-            }
+            block?.invoke(result)?.transmit(EventActionAdapterAccepter(accepter))
+        }
+
+        fun cancel() {
+            block = null
         }
     }
 
@@ -61,6 +67,8 @@ class ConvertDisposer<T, R>(
     override fun cancel() {
         disposer?.cancel()
         disposer = null
-        transformer = null
+        convertAccepter?.cancel()
+        convertAccepter = null
+        block = null
     }
 }

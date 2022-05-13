@@ -44,7 +44,7 @@ class TstViewModelFragment : BaseFragment() {
         binding.queryBtn.setOnClickListener {
             val text = binding.textEt.text.toString()
             if (text.isNotEmpty()) {
-                progressDialog.show()
+                progressView.show()
                 tstViewModel.languageTranslation(text)
             } else {
                 Toast.makeText(requireContext(), "翻译的文本不能为空!", Toast.LENGTH_SHORT).show()
@@ -52,9 +52,7 @@ class TstViewModelFragment : BaseFragment() {
         }
 
         tstViewModel.translationResult.observe(viewLifecycleOwner, Observer {
-            if (progressDialog.isShowing) {
-                progressDialog.dismiss()
-            }
+            progressView.dismiss()
             binding.resultTv.text = it
         })
     }

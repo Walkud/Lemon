@@ -1,15 +1,13 @@
 package com.tube.http.use
 
-import android.app.ProgressDialog
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.tube.http.use.disposer.ProgressView
 
 open class BaseFragment : Fragment() {
 
-    protected val progressDialog by lazy {
-        ProgressDialog(requireActivity()).apply {
-            setMessage("查询中...")
-        }
+    protected val progressView by lazy {
+        ProgressView.PvDialg(requireActivity())
     }
 
     fun showToast(msg: String) {

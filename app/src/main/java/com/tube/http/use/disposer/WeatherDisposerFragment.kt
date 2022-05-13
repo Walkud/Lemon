@@ -88,28 +88,16 @@ class WeatherDisposerFragment : BaseFragment() {
         thread {
             val createTime = System.currentTimeMillis()
             Net.getWeatherDisposerApiService().getCityWeatherInfo(cityCode, createTime)
-                .bindLifecycle(lifecycle, Lifecycle.Event.ON_DESTROY)
+                .warp { createUiDisposer(progressView, it) }
                 .subscribe(object : SimpleAccepter<WeatherResult>() {
-                    override fun onStart() {
-                        super.onStart()
-                        progressDialog.show()
-                    }
-
                     override fun call(result: WeatherResult) {
                         super.call(result)
-                        requireActivity().runOnUiThread {
-                            binding.resultTv.text = Gson().toJson(result)
-                        }
+                        binding.resultTv.text = Gson().toJson(result)
                     }
 
                     override fun onError(throwable: Throwable) {
                         super.onError(throwable)
                         binding.resultTv.text = "获取城市天气异常：${throwable.message}"
-                    }
-
-                    override fun onEnd(endState: Accepter.EndState) {
-                        super.onEnd(endState)
-                        progressDialog.dismiss()
                     }
                 })
         }

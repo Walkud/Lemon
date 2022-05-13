@@ -2,7 +2,6 @@ package com.tube.http.disposer.adapter
 
 import com.tube.http.adapter.ApiAdapter
 import com.tube.http.disposer.Disposer
-import com.tube.http.disposer.transformer.ConvertTransformer
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -34,11 +33,7 @@ class DisposerApiAdapterFactory : ApiAdapter.Factory() {
     private object DisposerApiAdapter : ApiAdapter {
         override fun adapt(block: () -> Any): Any {
             return Disposer.create(block)
-                .convert(object : ConvertTransformer<() -> Any, Any> {
-                    override fun convert(result: () -> Any): Disposer<Any> {
-                        return Disposer.create(result())
-                    }
-                })
+                .convert { Disposer.create(it()) }
         }
 
         override fun getActualType(type: Type): Type {

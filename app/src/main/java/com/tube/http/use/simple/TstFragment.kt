@@ -44,7 +44,7 @@ class TstFragment : BaseFragment(), CoroutineScope by MainScope() {
             val text = binding.textEt.text.toString()
             launch {
                 if (text.isNotEmpty()) {
-                    progressDialog.show()
+                    progressView.show()
                     binding.resultTv.text = try {
                         val result = withContext(Dispatchers.IO) {
                             delay(3000)//模拟延迟
@@ -54,7 +54,7 @@ class TstFragment : BaseFragment(), CoroutineScope by MainScope() {
                     } catch (e: Exception) {
                         "语言翻译异常：${e.message}"
                     }
-                    progressDialog.dismiss()
+                    progressView.dismiss()
                 } else {
                     Toast.makeText(requireContext(), "翻译的文本不能为空!", Toast.LENGTH_SHORT).show()
                 }
