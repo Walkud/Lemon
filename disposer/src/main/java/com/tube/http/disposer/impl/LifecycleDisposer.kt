@@ -55,7 +55,6 @@ class LifecycleDisposer<T>(
      */
     private fun removeObserver() {
         UiUtil.runUiThread {
-            Log.d("LifecycleDisposer", "removeObserver")
             lifecycle?.removeObserver(lifecycleObserver)
             lifecycle = null
         }
