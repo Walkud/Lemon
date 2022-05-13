@@ -45,7 +45,7 @@ abstract class Scheduler {
          * 协程作用域
          */
         private val scope = object : CoroutineScope {
-            override val coroutineContext: CoroutineContext = coroutineDispatcher + Job()
+            override val coroutineContext: CoroutineContext = coroutineDispatcher + SupervisorJob()
         }
 
         /**
