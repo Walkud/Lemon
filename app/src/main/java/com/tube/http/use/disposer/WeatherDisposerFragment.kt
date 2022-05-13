@@ -85,22 +85,20 @@ class WeatherDisposerFragment : BaseFragment() {
     }
 
     private fun queryCityWeatherInfo() {
-        thread {
-            val createTime = System.currentTimeMillis()
-            Net.getWeatherDisposerApiService().getCityWeatherInfo(cityCode, createTime)
-                .warp { createUiDisposer(progressView, it) }
-                .subscribe(object : SimpleAccepter<WeatherResult>() {
-                    override fun call(result: WeatherResult) {
-                        super.call(result)
-                        binding.resultTv.text = Gson().toJson(result)
-                    }
+        val createTime = System.currentTimeMillis()
+        Net.getWeatherDisposerApiService().getCityWeatherInfo(cityCode, createTime)
+            .warp { createUiDisposer(progressView, it) }
+            .subscribe(object : SimpleAccepter<WeatherResult>() {
+                override fun call(result: WeatherResult) {
+                    super.call(result)
+                    binding.resultTv.text = Gson().toJson(result)
+                }
 
-                    override fun onError(throwable: Throwable) {
-                        super.onError(throwable)
-                        binding.resultTv.text = "获取城市天气异常：${throwable.message}"
-                    }
-                })
-        }
+                override fun onError(throwable: Throwable) {
+                    super.onError(throwable)
+                    binding.resultTv.text = "获取城市天气异常：${throwable.message}"
+                }
+            })
     }
 
     override fun onDestroyView() {

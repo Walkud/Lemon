@@ -16,7 +16,6 @@ private fun <T> buildProgressUiDisposer(
         .bindLifecycle(lifecycle, event)
         .doStart { progressView.show() }
         .doEnd { progressView.dismiss() }
-        .disposerOn(Scheduler.main())
 }
 
 fun <T> ComponentActivity.createUiDisposer(
