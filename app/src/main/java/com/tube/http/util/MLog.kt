@@ -5,7 +5,7 @@ import android.util.Log
 class MLog private constructor() {
 
     companion object {
-        private const val TAG = "TubeDemo"
+        private const val TAG = "Demo"
 
         fun d(msg: String, tag: String = TAG) {
             Log.d(tag, "$msg,thread:${Thread.currentThread()}")
