@@ -21,7 +21,7 @@ abstract class Scheduler {
     }
 
     /**
-     * 执行
+     * 通过指定调度器调度执行
      */
     protected abstract fun run(block: () -> Unit)
 
@@ -42,7 +42,7 @@ abstract class Scheduler {
      */
     class CoroutineScheduler(coroutineDispatcher: CoroutineDispatcher) : Scheduler() {
         /**
-         *
+         * 协程作用域
          */
         private val scope = object : CoroutineScope {
             override val coroutineContext: CoroutineContext = coroutineDispatcher + Job()
