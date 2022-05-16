@@ -12,12 +12,17 @@ abstract class Scheduler {
         /**
          * 获取主线程调度器
          */
-        fun main() = CoroutineScheduler(Dispatchers.Main)
+        fun main() = CoroutineScheduler(Dispatchers.Main + SupervisorJob())
 
         /**
          * 获取 IO 调度器
          */
-        fun io() = CoroutineScheduler(Dispatchers.IO)
+        fun io() = CoroutineScheduler(Dispatchers.IO + SupervisorJob())
+
+        /**
+         * 自定义作用域调度器
+         */
+        fun custom(context: CoroutineContext) = CoroutineScheduler(context)
     }
 
     /**
@@ -40,12 +45,12 @@ abstract class Scheduler {
     /**
      * 协程调度器
      */
-    class CoroutineScheduler(coroutineDispatcher: CoroutineDispatcher) : Scheduler() {
+    class CoroutineScheduler(context: CoroutineContext) : Scheduler() {
         /**
          * 协程作用域
          */
         private val scope = object : CoroutineScope {
-            override val coroutineContext: CoroutineContext = coroutineDispatcher + SupervisorJob()
+            override val coroutineContext: CoroutineContext = context
         }
 
         /**
