@@ -1,6 +1,5 @@
 package com.lemon.http.adapter
 
-import com.lemon.http.adapter.ApiAdapter
 import com.lemon.http.referenceName
 import java.lang.reflect.Method
 import java.lang.reflect.Type
@@ -54,8 +53,14 @@ internal class ApiAdapterFinder(private val apiAdapterFactorys: List<ApiAdapter.
      */
     private object DefaultApiAdapter : ApiAdapter {
 
+        /**
+         * 适配，不做任何处理直接调用
+         */
         override fun adapt(block: () -> Any) = block()
 
+        /**
+         * 获取返回实际类型
+         */
         override fun getActualType(type: Type) = type
     }
 

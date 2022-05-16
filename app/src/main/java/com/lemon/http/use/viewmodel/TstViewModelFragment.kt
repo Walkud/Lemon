@@ -14,7 +14,7 @@ import com.lemon.http.use.BaseFragment
 import com.lemon.http.use.viewmodel.model.TstViewModel
 
 /**
- * 语言翻译 Fragment
+ * 语言翻译 Fragment，简单结合使用 ViewModel
  */
 class TstViewModelFragment : BaseFragment() {
 

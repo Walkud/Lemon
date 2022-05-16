@@ -15,7 +15,7 @@ import com.lemon.http.use.BaseFragment
 import kotlinx.coroutines.*
 
 /**
- * 简单使用示例 城市天气预报 Fragment
+ * 简单使用示例 城市天气预报 Fragment，使用协程进行异步调度
  */
 class WeatherFragment : BaseFragment(), CoroutineScope by MainScope() {
 

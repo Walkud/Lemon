@@ -2,7 +2,6 @@ package com.lemon.http.interceptor
 
 import com.lemon.http.request.Request
 import com.lemon.http.request.Response
-import com.lemon.http.request.body.ResponseBody
 import java.io.IOException
 import kotlin.jvm.Throws
 

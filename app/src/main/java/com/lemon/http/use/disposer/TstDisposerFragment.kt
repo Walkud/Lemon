@@ -48,19 +48,15 @@ class TstDisposerFragment : BaseFragment() {
             val text = binding.textEt.text.toString()
             if (text.isNotEmpty()) {
                 Net.getTstDisposerApiService().languageTranslation(text)
-                    .doEnd {
+                    .doEnd {//可以自行监听结束事件
                         MLog.d("bindLifecycle Up doEnd call:$it")
                     }
-                    .warp { createUiDisposer(progressView, it) }
+                    .warp { createUiDisposer(progressView, it) }//使用统一封装的 UI  Disposer
+                    .doError { binding.resultTv.text = "语言翻译异常：${it.message}" }//处理异常错误
                     .subscribe(object : SimpleAccepter<TstResult>() {
                         override fun call(result: TstResult) {
                             super.call(result)
                             binding.resultTv.text = Gson().toJson(result)
-                        }
-
-                        override fun onError(throwable: Throwable) {
-                            super.onError(throwable)
-                            binding.resultTv.text = "语言翻译异常：${throwable.message}"
                         }
                     })
             } else {

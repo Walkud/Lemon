@@ -15,7 +15,7 @@ import com.lemon.http.use.BaseFragment
 import com.lemon.http.use.viewmodel.model.WeatherViewModel
 
 /**
- * 城市天气预报 Fragment
+ * 城市天气预报 Fragment，简单结合使用 ViewModel
  */
 class WeatherViewModelFragment : BaseFragment() {
 

@@ -9,6 +9,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.Exception
 
+/**
+ * 语言翻译 ViewModel
+ */
 class TstViewModel : ViewModel() {
 
     var translationResult = MutableLiveData<String>()

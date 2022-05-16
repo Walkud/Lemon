@@ -7,7 +7,7 @@ package com.lemon.http.disposer
 interface Accepter<T> {
 
     /**
-     * 开始事件，事件开始传递前触发
+     * 开始事件，事件开始传递前触发。可以考虑使用 Disposer doStart 代替。
      */
     fun onStart()
 
@@ -17,13 +17,13 @@ interface Accepter<T> {
     fun call(result: T)
 
     /**
-     * 结束事件，事件传递完成后触发
+     * 结束事件，事件传递完成后触发。可以考虑使用 Disposer doEnd 代替。
      * 注意：当事件传递过程中出现异常后，该方法也会被调用
      */
     fun onEnd(endState: EndState)
 
     /**
-     * 异常错误事件
+     * 异常错误事件。可以考虑使用 Disposer doError 代替。
      */
     fun onError(throwable: Throwable)
 

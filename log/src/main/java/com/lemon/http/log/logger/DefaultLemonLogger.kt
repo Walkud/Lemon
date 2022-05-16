@@ -5,7 +5,7 @@ import java.util.logging.Level
 import java.util.logging.Logger
 
 /**
- * Describe:
+ * Describe: Lemon 默认的日志输出器
  * Created by liya.zhu on 2022/4/14
  */
 class DefaultLemonLogger : LemonLogger {

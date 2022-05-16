@@ -9,6 +9,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.Exception
 
+/**
+ * 城市天气预报 ViewModel
+ */
 class WeatherViewModel : ViewModel() {
 
     var cityWeatherResult = MutableLiveData<String>()

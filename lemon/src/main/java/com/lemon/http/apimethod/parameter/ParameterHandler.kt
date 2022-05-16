@@ -156,6 +156,9 @@ internal interface ParameterHandler<in T> {
         }
     }
 
+    /**
+     * 处理 @Part 注解，将实参部件数据添加到请求中
+     */
     class Part(
         private val index: Int,
         private val method: Method,
@@ -169,6 +172,9 @@ internal interface ParameterHandler<in T> {
         }
     }
 
+    /**
+     * 处理 @Part 注解，将实参部件 Map 数据添加到请求中
+     */
     class PartMap(
         private val index: Int,
         private val method: Method,

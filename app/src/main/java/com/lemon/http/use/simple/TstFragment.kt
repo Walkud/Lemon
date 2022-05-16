@@ -14,7 +14,7 @@ import com.lemon.http.use.BaseFragment
 import kotlinx.coroutines.*
 
 /**
- * 简单使用示例语言翻译 Fragment
+ * 简单使用示例语言翻译 Fragment，使用协程进行异步调度
  */
 class TstFragment : BaseFragment(), CoroutineScope by MainScope() {
 
