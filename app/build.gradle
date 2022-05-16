@@ -5,7 +5,7 @@ android {
     compileSdkVersion 30
 
     defaultConfig {
-        applicationId "com.tube.http"
+        applicationId "com.lemon.http"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
@@ -40,7 +40,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':tube')
+    implementation project(':lemon')
 
     implementation 'androidx.core:core-ktx:1.6.0'
     implementation 'androidx.appcompat:appcompat:1.3.0'

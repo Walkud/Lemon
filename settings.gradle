@@ -1,5 +1,5 @@
-rootProject.name = "Tube"
+rootProject.name = "Lemon"
 include ':app'
-include ':tube'
+include ':lemon'
 include ':log'
 include ':disposer'

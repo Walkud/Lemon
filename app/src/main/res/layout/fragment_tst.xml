@@ -13,7 +13,7 @@
         android:layout_marginRight="20dp"
         android:hint="请输入需要翻译的文本"
         android:maxLines="10"
-        android:text="Hello Tube!"
+        android:text="Hello Lemon!"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

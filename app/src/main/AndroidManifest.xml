@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.tube.http">
+    package="com.lemon.http">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -13,13 +13,13 @@
         android:usesCleartextTraffic="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Tube"
+        android:theme="@style/Theme.Lemon"
         tools:targetApi="n">
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Tube.NoActionBar">
+            android:theme="@style/Theme.Lemon.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
