@@ -3,7 +3,7 @@ package com.lemon.http.disposer.impl
 import com.lemon.http.disposer.Accepter
 import com.lemon.http.disposer.utils.UiUtil
 
-internal class SubscribeAccepter<T>(private var block: ((T) -> Unit)?) : Accepter<T> {
+internal class CallAccepter<T>(private var block: ((T) -> Unit)?) : Accepter<T> {
     override fun onStart() {
     }
 

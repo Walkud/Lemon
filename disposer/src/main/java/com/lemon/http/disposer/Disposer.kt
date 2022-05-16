@@ -68,7 +68,12 @@ abstract class Disposer<T> {
         EventActionDisposer(this, EventActionDisposer.EventAction.EndAction(block))
 
     /**
-     * 订阅，开始传递事件
+     * 仅订阅 Call 事件并开始传递事件
      */
-    fun subscribe(block: (T) -> Unit) = transmit(SubscribeAccepter(block))
+    fun subscribe(block: (T) -> Unit) = subscribe(CallAccepter(block))
+
+    /**
+     * 订阅事件并开始传递事件
+     */
+    fun subscribe(accepter: Accepter<T>) = transmit(accepter)
 }
