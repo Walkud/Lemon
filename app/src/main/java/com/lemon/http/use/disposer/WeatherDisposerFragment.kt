@@ -85,12 +85,7 @@ class WeatherDisposerFragment : BaseFragment() {
         Net.getWeatherDisposerApiService().getCityWeatherInfo(cityCode, createTime)
             .warp { createUiDisposer(progressView, it) }//使用统一封装的 UI  Disposer
             .doError { binding.resultTv.text = "获取城市天气异常：${it.message}" }//处理异常错误
-            .subscribe(object : SimpleAccepter<WeatherResult>() {
-                override fun call(result: WeatherResult) {
-                    super.call(result)
-                    binding.resultTv.text = Gson().toJson(result)
-                }
-            })
+            .subscribe { binding.resultTv.text = Gson().toJson(it) }
     }
 
     override fun onDestroyView() {

@@ -53,12 +53,7 @@ class TstDisposerFragment : BaseFragment() {
                     }
                     .warp { createUiDisposer(progressView, it) }//使用统一封装的 UI  Disposer
                     .doError { binding.resultTv.text = "语言翻译异常：${it.message}" }//处理异常错误
-                    .subscribe(object : SimpleAccepter<TstResult>() {
-                        override fun call(result: TstResult) {
-                            super.call(result)
-                            binding.resultTv.text = Gson().toJson(result)
-                        }
-                    })
+                    .subscribe { binding.resultTv.text = Gson().toJson(it) }
             } else {
                 Toast.makeText(requireContext(), "翻译的文本不能为空!", Toast.LENGTH_SHORT).show()
             }
@@ -88,23 +83,7 @@ class TstDisposerFragment : BaseFragment() {
             .doStart { MLog.d("doStart call") }
             .doEnd { MLog.d("doEnd call:$it") }
             .doError { MLog.d("doError call :${it.message}") }
-            .subscribe(object : Accepter<Int> {
-                override fun call(result: Int) {
-                    MLog.d(result.toString())
-                }
-
-                override fun onStart() {
-                    MLog.d("Accepter onStart call")
-                }
-
-                override fun onEnd(endState: Accepter.EndState) {
-                    MLog.d("Accepter onEnd call:$endState")
-                }
-
-                override fun onError(throwable: Throwable) {
-                    MLog.d("Accepter onError call :${throwable.message}")
-                }
-            })
+            .subscribe { MLog.d(it.toString()) }
     }
 
     override fun onDestroyView() {

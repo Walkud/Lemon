@@ -70,5 +70,5 @@ abstract class Disposer<T> {
     /**
      * 订阅，开始传递事件
      */
-    fun subscribe(accepter: Accepter<T>) = transmit(SubscribeAccepter(accepter))
+    fun subscribe(block: (T) -> Unit) = transmit(SubscribeAccepter(block))
 }
