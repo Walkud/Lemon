@@ -19,7 +19,7 @@ private fun <T> buildProgressUiDisposer(
     disposer: Disposer<T>,
     event: Lifecycle.Event
 ): Disposer<T> {
-    return disposer.disposerOn(Scheduler.io())// IO 异步调度
+    return disposer.scheduleNet()// 网络调度
         .bindLifecycle(lifecycle, event)//绑定 UI 生命周期
         .doStart { progressView.show() } //开始时显示进度 UI
         .doEnd { progressView.dismiss() } //结束时隐藏进度 UI

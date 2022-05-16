@@ -22,18 +22,18 @@ class EventActionDisposer<T>(
      */
     private class EventActionAccepter<T>(
         accepter: Accepter<T>,
-        private val action: EventAction?
+        private var action: EventAction?
     ) : AbstractEventActionAccepter<T, T>(accepter) {
 
         override fun call(result: T) {
-            accepter.call(result)
+            accepter?.call(result)
         }
 
         override fun onStart() {
             super.onStart()
             //分发 doStart 事件
             if (action is EventAction.StartAction) {
-                action.invoke()
+                (action as EventAction.StartAction).invoke()
             }
         }
 
@@ -41,15 +41,16 @@ class EventActionDisposer<T>(
             super.onEnd(endState)
             //分发 onEnd 事件
             if (action is EventAction.EndAction) {
-                action.invoke(endState)
+                (action as EventAction.EndAction).invoke(endState)
             }
+            action = null
         }
 
         override fun onError(throwable: Throwable) {
             super.onError(throwable)
             //分发 onError
             if (action is EventAction.ErrorAction) {
-                action.invoke(throwable)
+                (action as EventAction.ErrorAction).invoke(throwable)
             }
         }
     }
@@ -63,9 +64,7 @@ class EventActionDisposer<T>(
          */
         class StartAction(private val block: () -> Unit) : EventAction() {
             fun invoke() {
-                UiUtil.runUiThread {
-                    block.invoke()
-                }
+                block.invoke()
             }
         }
 
@@ -74,9 +73,7 @@ class EventActionDisposer<T>(
          */
         class EndAction(private val block: (endState: Accepter.EndState) -> Unit) : EventAction() {
             fun invoke(endState: Accepter.EndState) {
-                UiUtil.runUiThread {
-                    block.invoke(endState)
-                }
+                block.invoke(endState)
             }
         }
 
@@ -85,9 +82,7 @@ class EventActionDisposer<T>(
          */
         class ErrorAction(private val block: (throwable: Throwable) -> Unit) : EventAction() {
             fun invoke(throwable: Throwable) {
-                UiUtil.runUiThread {
-                    block.invoke(throwable)
-                }
+                block.invoke(throwable)
             }
         }
     }

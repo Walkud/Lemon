@@ -30,7 +30,7 @@ class ConvertDisposer<T, R>(
      * 3、执行事件 R 处理器，继续传递事件 R
      */
     class ConvertAccepter<T, R>(
-        accepter: Accepter<R>,
+        accepter: Accepter<R>?,
         private var block: ((T) -> Disposer<R>)?
     ) : AbstractEventActionAccepter<T, R>(accepter) {
 
@@ -47,10 +47,10 @@ class ConvertDisposer<T, R>(
      * 事件行为传递过滤适配接收器
      * 事件转换后触发的事件行为过滤掉 onStart 和 onEnd 事件，仅向下层传递 onError 事件。
      */
-    private class EventActionAdapterAccepter<R>(accepter: Accepter<R>) :
+    private class EventActionAdapterAccepter<R>(accepter: Accepter<R>?) :
         AbstractEventActionAccepter<R, R>(accepter) {
         override fun call(result: R) {
-            accepter.call(result)
+            accepter?.call(result)
         }
 
         override fun onStart() {
@@ -60,7 +60,7 @@ class ConvertDisposer<T, R>(
         }
 
         override fun onError(throwable: Throwable) {
-            accepter.onError(throwable)
+            accepter?.onError(throwable)
         }
     }
 

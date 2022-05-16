@@ -9,6 +9,12 @@ import kotlin.coroutines.CoroutineContext
 abstract class Scheduler {
 
     companion object {
+
+        /**
+         * 默认调度器
+         */
+        fun default() = CoroutineScheduler(Dispatchers.Default + SupervisorJob())
+
         /**
          * 获取主线程调度器
          */
@@ -54,11 +60,18 @@ abstract class Scheduler {
         }
 
         /**
+         * 是否取消调度
+         */
+        private var isCancel = false
+
+        /**
          * 通过指定协程作用域进行调度执行
          */
         override fun run(block: () -> Unit) {
-            scope.launch {
-                block()
+            if (!isCancel) {
+                scope.launch {
+                    block()
+                }
             }
         }
 
@@ -66,6 +79,7 @@ abstract class Scheduler {
          * 取消协程
          */
         override fun cancel() {
+            isCancel = true
             scope.cancel()
         }
     }

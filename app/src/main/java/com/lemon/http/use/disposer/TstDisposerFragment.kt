@@ -68,18 +68,22 @@ class TstDisposerFragment : BaseFragment() {
             .convert { result ->
                 MLog.d("exce convert")
                 Disposer.create(result.toInt() * 10)
+                    .schedule(accepterScheduler = Scheduler.main())
                     .doStart { MLog.d("convert doStart call") }
                     .doEnd { MLog.d("convert doEnd call:$it") }
                     .doError { MLog.d("convert doError call :${it.message}") }
-                    .convert { Disposer.create(it / 0) }
+//                    .convert { Disposer.create(it / 0) }
+
             }
             .warp { disposer ->
                 MLog.d("exce warp")
-                disposer.doStart { MLog.d("warp doStart call") }
+                disposer
+                    .schedule(accepterScheduler = Scheduler.main())
+                    .doStart { MLog.d("warp doStart call") }
                     .doEnd { MLog.d("warp doEnd call:$it") }
                     .doError { MLog.d("warp doError call :${it.message}") }
             }
-            .disposerOn(Scheduler.io())
+            .schedule(Scheduler.io(), Scheduler.main())
             .doStart { MLog.d("doStart call") }
             .doEnd { MLog.d("doEnd call:$it") }
             .doError { MLog.d("doError call :${it.message}") }

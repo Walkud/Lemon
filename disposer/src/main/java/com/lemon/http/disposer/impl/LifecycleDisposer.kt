@@ -29,9 +29,11 @@ class LifecycleDisposer<T>(
 
 
     override fun transmit(accepter: Accepter<T>) {
-        this.lifecycleAccepter = LifecycleAccepter(accepter)
-        lifecycleAccepter?.let {
-            disposer?.transmit(it)
+        disposer?.let {
+            this.lifecycleAccepter = LifecycleAccepter(accepter)
+            lifecycleAccepter?.let { accepter ->
+                it.transmit(accepter)
+            }
         }
     }
 
@@ -65,7 +67,7 @@ class LifecycleDisposer<T>(
     private inner class LifecycleAccepter<T>(accepter: Accepter<T>) :
         AbstractEventActionAccepter<T, T>(accepter) {
         override fun call(result: T) {
-            accepter.call(result)
+            accepter?.call(result)
         }
 
         override fun onEnd(endState: Accepter.EndState) {
@@ -73,6 +75,7 @@ class LifecycleDisposer<T>(
             if (endState == Accepter.EndState.Normal) {
                 removeObserver()
             }
+            accepter = null
         }
     }
 

@@ -45,9 +45,17 @@ abstract class Disposer<T> {
         LifecycleDisposer(this, lifecycle, bindEvent)
 
     /**
-     * 处理器执行调度
+     * 执行调度
      */
-    fun disposerOn(scheduler: Scheduler) = SchedulerDisposer(this, scheduler)
+    fun schedule(
+        disposerScheduler: Scheduler = Scheduler.default(),
+        accepterScheduler: Scheduler = Scheduler.default()
+    ) = SchedulerDisposer(this, disposerScheduler, accepterScheduler)
+
+    /**
+     * 网络执行调度，处理器 io 调度，接收器主线程调度
+     */
+    fun scheduleNet() = SchedulerDisposer(this, Scheduler.io(), Scheduler.main())
 
     /**
      * 开始事件监听，可以用于进度弹框、开始与结束按钮状态转换场景，与 doEnd 事件结合使用，UI 线程中回调
