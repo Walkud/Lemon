@@ -60,7 +60,7 @@ class EventActionDisposer<T>(
      */
     sealed class EventAction {
         /**
-         * start 行为，UI 线程中回调
+         * start 行为
          */
         class StartAction(private val block: () -> Unit) : EventAction() {
             fun invoke() {
@@ -69,7 +69,7 @@ class EventActionDisposer<T>(
         }
 
         /**
-         * end 行为，UI 线程中回调
+         * end 行为
          */
         class EndAction(private val block: (endState: Accepter.EndState) -> Unit) : EventAction() {
             fun invoke(endState: Accepter.EndState) {
@@ -78,7 +78,7 @@ class EventActionDisposer<T>(
         }
 
         /**
-         * 错误行为，UI 线程中回调
+         * 错误行为
          */
         class ErrorAction(private val block: (throwable: Throwable) -> Unit) : EventAction() {
             fun invoke(throwable: Throwable) {

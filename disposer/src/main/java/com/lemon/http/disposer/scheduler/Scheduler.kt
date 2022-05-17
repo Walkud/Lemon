@@ -1,5 +1,6 @@
 package com.lemon.http.disposer.scheduler
 
+import com.lemon.http.disposer.utils.UiUtil
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
@@ -11,6 +12,11 @@ abstract class Scheduler {
     companion object {
 
         /**
+         * unconfined 调度器
+         */
+        fun unconfined() = CoroutineScheduler(Dispatchers.Unconfined + SupervisorJob())
+
+        /**
          * 默认调度器
          */
         fun default() = CoroutineScheduler(Dispatchers.Default + SupervisorJob())
@@ -18,7 +24,7 @@ abstract class Scheduler {
         /**
          * 获取主线程调度器
          */
-        fun main() = CoroutineScheduler(Dispatchers.Main + SupervisorJob())
+        fun main() = CoroutineScheduler(Dispatchers.Main.immediate + SupervisorJob())
 
         /**
          * 获取 IO 调度器

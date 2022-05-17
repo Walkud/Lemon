@@ -48,8 +48,8 @@ abstract class Disposer<T> {
      * 执行调度
      */
     fun schedule(
-        disposerScheduler: Scheduler = Scheduler.default(),
-        accepterScheduler: Scheduler = Scheduler.default()
+        disposerScheduler: Scheduler = Scheduler.unconfined(),
+        accepterScheduler: Scheduler = Scheduler.unconfined()
     ) = SchedulerDisposer(this, disposerScheduler, accepterScheduler)
 
     /**
@@ -58,19 +58,19 @@ abstract class Disposer<T> {
     fun scheduleNet() = SchedulerDisposer(this, Scheduler.io(), Scheduler.main())
 
     /**
-     * 开始事件监听，可以用于进度弹框、开始与结束按钮状态转换场景，与 doEnd 事件结合使用，UI 线程中回调
+     * 开始事件监听，可以用于进度弹框、开始与结束按钮状态转换场景，与 doEnd 事件结合使用
      */
     fun doStart(block: () -> Unit): Disposer<T> =
         EventActionDisposer(this, EventActionDisposer.EventAction.StartAction(block))
 
     /**
-     * 错误事件监听，UI 线程中回调
+     * 错误事件监听
      */
     fun doError(block: (throwable: Throwable) -> Unit): Disposer<T> =
         EventActionDisposer(this, EventActionDisposer.EventAction.ErrorAction(block))
 
     /**
-     * 完成事件监听，可以用于进度弹框、开始与结束按钮状态转换场景，与 doStart 事件结合使用，UI 线程中回调
+     * 完成事件监听，可以用于进度弹框、开始与结束按钮状态转换场景，与 doStart 事件结合使用
      */
     fun doEnd(block: (endState: Accepter.EndState) -> Unit): Disposer<T> =
         EventActionDisposer(this, EventActionDisposer.EventAction.EndAction(block))
