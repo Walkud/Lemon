@@ -79,7 +79,6 @@ class LemonSpace<T> private constructor(
                 doStartBlocks.forEach { it.invoke() }
                 //异步执行网络请求
                 val result = withContext(Dispatchers.IO) {
-                    delay(3000)
                     apiBlock()
                 }
                 //回调结果
