@@ -1,11 +1,14 @@
 package com.lemon.http.net
 
+import com.lemon.http.space.adapter.LemonSpaceApiAdapterFactory
 import com.lemon.http.BuildConfig
 import com.lemon.http.Lemon
 import com.lemon.http.api.TstApiService
 import com.lemon.http.api.WeatherApiService
 import com.lemon.http.api.disposer.TstDisposerApiService
 import com.lemon.http.api.disposer.WeatherDisposerApiService
+import com.lemon.http.api.space.TstLemonSpaceApiService
+import com.lemon.http.api.space.WeatherLemonSpaceApiService
 import com.lemon.http.client.LemonClient
 import com.lemon.http.disposer.adapter.DisposerApiAdapterFactory
 import com.lemon.http.factory.GsonConverterFactory
@@ -27,6 +30,7 @@ object Net {
         addConverterFactory(GsonConverterFactory())
         //添加 Disposer 返回类型转换工厂
         addApiAdapterFactory(DisposerApiAdapterFactory())
+        addApiAdapterFactory(LemonSpaceApiAdapterFactory())
         //添加请求拦截器
         addInterceptor(object : Interceptor {
             override fun intercept(chain: Interceptor.Chain): Response {
@@ -55,4 +59,8 @@ object Net {
     fun getTstDisposerApiService() = lemon.create(TstDisposerApiService::class.java)
 
     fun getWeatherDisposerApiService() = lemon.create(WeatherDisposerApiService::class.java)
+
+    fun getTstLemonSpaceApiService() = lemon.create(TstLemonSpaceApiService::class.java)
+
+    fun getWeatherLemonSpaceApiService() = lemon.create(WeatherLemonSpaceApiService::class.java)
 }

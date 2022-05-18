@@ -50,8 +50,7 @@ class TstDisposerFragment : BaseFragment() {
                 Net.getTstDisposerApiService().languageTranslation(text)
                     .doEnd {//可以自行监听结束事件
                         MLog.d("bindLifecycle Up doEnd call:$it")
-                    }
-                    .warp { createUiDisposer(progressView, it) }//使用统一封装的 UI  Disposer
+                    }.bindUi(progressView, lifecycle)
                     .doError { binding.resultTv.text = "语言翻译异常：${it.message}" }//处理异常错误
                     .subscribe { binding.resultTv.text = Gson().toJson(it) }
             } else {

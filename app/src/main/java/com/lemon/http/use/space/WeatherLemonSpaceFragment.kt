@@ -1,4 +1,4 @@
-package com.lemon.http.use.disposer
+package com.lemon.http.use.space
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,16 +9,14 @@ import android.widget.ArrayAdapter
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.lemon.http.R
-import com.lemon.http.bean.WeatherResult
 import com.lemon.http.databinding.FragmentWeatherBinding
 import com.lemon.http.net.Net
 import com.lemon.http.use.BaseFragment
-import kotlinx.coroutines.*
 
 /**
- * 简单使用示例 城市天气预报 Fragment
+ * LemonSpace 使用示例 城市天气预报 Fragment，使用协程进行异步调度
  */
-class WeatherDisposerFragment : BaseFragment() {
+class WeatherLemonSpaceFragment : BaseFragment() {
 
     private var _binding: FragmentWeatherBinding? = null
     private val cityCodes =
@@ -82,10 +80,12 @@ class WeatherDisposerFragment : BaseFragment() {
 
     private fun queryCityWeatherInfo() {
         val createTime = System.currentTimeMillis()
-        Net.getWeatherDisposerApiService().getCityWeatherInfo(cityCode, createTime)
-            .bindUi(progressView, lifecycle)//使用统一封装的 UI  Disposer
+        Net.getWeatherLemonSpaceApiService().getCityWeatherInfo(cityCode, createTime)
+            .bindUi(progressView, lifecycle)
             .doError { binding.resultTv.text = "获取城市天气异常：${it.message}" }//处理异常错误
-            .subscribe { binding.resultTv.text = Gson().toJson(it) }
+            .request {
+                binding.resultTv.text = Gson().toJson(it)
+            }
     }
 
     override fun onDestroyView() {

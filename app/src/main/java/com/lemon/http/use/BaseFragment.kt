@@ -2,7 +2,7 @@ package com.lemon.http.use
 
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.lemon.http.use.disposer.ProgressView
+import com.lemon.http.view.ProgressView
 
 open class BaseFragment : Fragment() {
 

@@ -1,4 +1,4 @@
-package com.lemon.http.use.disposer
+package com.lemon.http.view
 
 import android.app.Activity
 import android.app.ProgressDialog
