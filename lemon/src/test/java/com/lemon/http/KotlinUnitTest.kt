@@ -9,11 +9,15 @@ import com.lemon.http.log.LemonLogLevel
 import com.lemon.http.request.Response
 import com.lemon.http.request.body.MultipartBody
 import com.lemon.http.request.body.RequestBody
+import kotlinx.coroutines.*
 import org.junit.Test
 import java.io.File
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.ContinuationInterceptor
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -167,6 +171,46 @@ class KotlinUnitTest {
             println("postPartBody code:${result.code},msg:${result.msg}")
         } catch (t: Throwable) {
             t.printStackTrace()
+        }
+    }
+
+    @Test
+    fun testCoroutine() {
+        /**
+         * 协程作用域
+         */
+        val scope = object : CoroutineScope {
+            override val coroutineContext: CoroutineContext =
+                SupervisorJob() + Dispatchers.IO + CoroutineExceptionHandler { _, throwable ->
+                    println("CoroutineExceptionHandler: $throwable")
+                } + object : ContinuationInterceptor {
+                    override val key: CoroutineContext.Key<*>
+                        get() = ContinuationInterceptor
+
+                    override fun <T> interceptContinuation(continuation: Continuation<T>): Continuation<T> {
+                        return object : Continuation<T> by continuation {
+                            override fun resumeWith(result: Result<T>) {
+                                println("startContinuation")
+                                continuation.resumeWith(result)
+                                println("EndContinuation")
+                            }
+                        }
+                    }
+                }
+        }
+
+        scope.launch {
+            println("1")
+            launch(Dispatchers.IO) {
+                println("2")
+                throw RuntimeException("throw exception 2")
+            }
+
+            launch {
+                println("3")
+                throw RuntimeException("throw exception 3")
+            }
+            println("4")
         }
     }
 }
