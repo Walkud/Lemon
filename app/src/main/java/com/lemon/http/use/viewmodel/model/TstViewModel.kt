@@ -12,19 +12,17 @@ import kotlin.Exception
 /**
  * 语言翻译 ViewModel
  */
-class TstViewModel : ViewModel() {
+class TstViewModel : BaseViewModel() {
 
     var translationResult = MutableLiveData<String>()
 
     fun languageTranslation(text: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val translationText = try {
+        request(
+            showProgress,
+            callBlock = {
                 val result = Net.getTstApiService().languageTranslation(text)
-                Gson().toJson(result)
-            } catch (e: Exception) {
-                "languageTranslation Exception :${e.message}"
-            }
-            translationResult.postValue(translationText)
-        }
+                translationResult.postValue(Gson().toJson(result))
+            },
+            errorBlock = { showToast.postValue("languageTranslation Exception :${it.message}") })
     }
 }

@@ -12,20 +12,15 @@ import kotlin.Exception
 /**
  * 城市天气预报 ViewModel
  */
-class WeatherViewModel : ViewModel() {
+class WeatherViewModel : BaseViewModel() {
 
     var cityWeatherResult = MutableLiveData<String>()
 
     fun getCityWeatherInfo(cityCode: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val translationText = try {
-                val createTime = System.currentTimeMillis()
-                val result = Net.getWeatherApiService().getCityWeatherInfo(cityCode, createTime)
-                Gson().toJson(result)
-            } catch (e: Exception) {
-                "getCityWeatherInfo Exception :${e.message}"
-            }
-            cityWeatherResult.postValue(translationText)
-        }
+        request(showProgress, {
+            val createTime = System.currentTimeMillis()
+            val result = Net.getWeatherApiService().getCityWeatherInfo(cityCode, createTime)
+            cityWeatherResult.postValue(Gson().toJson(result))
+        }, { showToast.postValue("getCityWeatherInfo Exception :${it.message}") })
     }
 }

@@ -17,10 +17,10 @@ import com.lemon.http.use.viewmodel.model.WeatherViewModel
 /**
  * 城市天气预报 Fragment，简单结合使用 ViewModel
  */
-class WeatherViewModelFragment : BaseFragment() {
+class WeatherViewModelFragment : BaseViewModelFragment<WeatherViewModel>() {
 
     private var _binding: FragmentWeatherBinding? = null
-    private val weatherViewModel by viewModels<WeatherViewModel>()
+
     private val cityCodes =
         listOf(
             "北京:101010100",
@@ -37,6 +37,8 @@ class WeatherViewModelFragment : BaseFragment() {
     private val binding get() = _binding!!
 
     private var cityCode = "101010100"
+
+    override fun getViewModelClass() = WeatherViewModel::class.java
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -79,19 +81,19 @@ class WeatherViewModelFragment : BaseFragment() {
             }
         }
 
-        weatherViewModel.cityWeatherResult.observe(viewLifecycleOwner, Observer {
-            progressView.dismiss()
+        viewModel.cityWeatherResult.observe(viewLifecycleOwner, Observer {
             binding.resultTv.text = it
         })
     }
 
     private fun getCityWeatherInfo() {
-        progressView.show()
-        weatherViewModel.getCityWeatherInfo(cityCode)
+        viewModel.getCityWeatherInfo(cityCode)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+
 }

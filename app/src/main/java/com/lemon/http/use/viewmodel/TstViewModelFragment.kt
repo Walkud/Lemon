@@ -16,14 +16,15 @@ import com.lemon.http.use.viewmodel.model.TstViewModel
 /**
  * 语言翻译 Fragment，简单结合使用 ViewModel
  */
-class TstViewModelFragment : BaseFragment() {
+class TstViewModelFragment : BaseViewModelFragment<TstViewModel>() {
 
     private var _binding: FragmentTstBinding? = null
-    private val tstViewModel by viewModels<TstViewModel>()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    override fun getViewModelClass() = TstViewModel::class.java
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,15 +45,13 @@ class TstViewModelFragment : BaseFragment() {
         binding.queryBtn.setOnClickListener {
             val text = binding.textEt.text.toString()
             if (text.isNotEmpty()) {
-                progressView.show()
-                tstViewModel.languageTranslation(text)
+                viewModel.languageTranslation(text)
             } else {
                 Toast.makeText(requireContext(), "翻译的文本不能为空!", Toast.LENGTH_SHORT).show()
             }
         }
 
-        tstViewModel.translationResult.observe(viewLifecycleOwner, Observer {
-            progressView.dismiss()
+        viewModel.translationResult.observe(viewLifecycleOwner, Observer {
             binding.resultTv.text = it
         })
     }
@@ -61,4 +60,5 @@ class TstViewModelFragment : BaseFragment() {
         super.onDestroyView()
         _binding = null
     }
+
 }
