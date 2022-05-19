@@ -60,6 +60,5 @@ class TstViewModelFragment : BaseFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        tstViewModel.translationResult.removeObservers(viewLifecycleOwner)
     }
 }

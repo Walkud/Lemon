@@ -81,7 +81,7 @@ class WeatherLemonSpaceFragment : BaseFragment() {
     private fun queryCityWeatherInfo() {
         val createTime = System.currentTimeMillis()
         Net.getWeatherLemonSpaceApiService().getCityWeatherInfo(cityCode, createTime)
-            .bindUi(progressView, lifecycle)
+            .bindUi(progressView, viewLifecycleOwner)
             .doError { binding.resultTv.text = "获取城市天气异常：${it.message}" }//处理异常错误
             .request {
                 binding.resultTv.text = Gson().toJson(it)

@@ -34,6 +34,7 @@ object Net {
         //添加请求拦截器
         addInterceptor(object : Interceptor {
             override fun intercept(chain: Interceptor.Chain): Response {
+                Thread.sleep(1000)//模拟耗时1秒
                 val request = chain.request()
                 val newRequest =
                     request.newBuilder()

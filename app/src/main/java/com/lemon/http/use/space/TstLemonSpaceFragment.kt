@@ -42,7 +42,7 @@ class TstLemonSpaceFragment : BaseFragment() {
         binding.queryBtn.setOnClickListener {
             val text = binding.textEt.text.toString()
             Net.getTstLemonSpaceApiService().languageTranslation(text)
-                .bindUi(progressView, lifecycle)
+                .bindUi(progressView, viewLifecycleOwner)
                 .doStart { MLog.d("doStart call!") }
                 .doEnd { MLog.d("doEnd call! $it") }
                 .doError {

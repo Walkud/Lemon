@@ -93,6 +93,5 @@ class WeatherViewModelFragment : BaseFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        weatherViewModel.cityWeatherResult.removeObservers(viewLifecycleOwner)
     }
 }

@@ -25,7 +25,7 @@ class LemonSpace<T> private constructor(
     private var doErrorBlocks: MutableList<(e: Exception) -> Unit> = mutableListOf()//异常回调函数集合
     private var doEndBlocks: MutableList<(endState: EndState) -> Unit> = mutableListOf()//完成回调函数集合
     private var requestBlock: ((T) -> Unit)? = null //请求回调函数
-    private var lifecycle: Lifecycle? = null
+    private var owner: LifecycleOwner? = null
     private var uiLifecycleObserver: UiLifecycleObserver? = null
 
     /**
@@ -46,21 +46,21 @@ class LemonSpace<T> private constructor(
     /**
      * 绑定 UI 生命周期
      */
-    fun bindLifecycle(lifecycle: Lifecycle, bindEvent: Lifecycle.Event) = apply {
+    fun bindLifecycle(owner: LifecycleOwner, bindEvent: Lifecycle.Event) = apply {
         lemonSpace.launch {
             //主线程中执行添加
-            addUiLifecycle(lifecycle, bindEvent)
+            addUiLifecycle(owner, bindEvent)
         }
     }
 
     /**
      * 添加 UI 生命周期监听
      */
-    private fun addUiLifecycle(lifecycle: Lifecycle, bindEvent: Lifecycle.Event) {
+    private fun addUiLifecycle(owner: LifecycleOwner, bindEvent: Lifecycle.Event) {
         if (!cancelled) {
-            this.lifecycle = lifecycle
+            this.owner = owner
             this.uiLifecycleObserver = UiLifecycleObserver(bindEvent).also {
-                lifecycle.addObserver(it)
+                owner.lifecycle.addObserver(it)
             }
         }
     }
@@ -86,8 +86,7 @@ class LemonSpace<T> private constructor(
             } catch (e: Exception) {
                 //触发异常事件
                 doErrorBlocks.forEach { it.invoke(e) }
-            } finally {
-                //触发完成事件
+            } finally { //触发完成事件
                 doEndBlocks.forEach { it.invoke(EndState.Normal) }
                 clear()
             }
@@ -113,9 +112,9 @@ class LemonSpace<T> private constructor(
         doEndBlocks.clear()
         requestBlock = null
         uiLifecycleObserver?.let {
-            lifecycle?.removeObserver(it)
+            owner?.lifecycle?.removeObserver(it)
             uiLifecycleObserver = null
-            lifecycle = null
+            owner = null
         }
     }
 
