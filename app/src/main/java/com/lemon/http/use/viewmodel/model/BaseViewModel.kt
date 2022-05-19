@@ -13,12 +13,12 @@ open class BaseViewModel : ViewModel() {
     var showProgress = MutableLiveData<Boolean>()
 
     fun request(
-        liveData: MutableLiveData<Boolean>? = null,
+        uiChangeLiveData: MutableLiveData<Boolean>? = null,
         callBlock: () -> Unit,
         errorBlock: ((e: Exception) -> Unit)? = null
     ) {
         viewModelScope.launch {
-            liveData?.postValue(true)
+            uiChangeLiveData?.postValue(true)
             try {
                 withContext(Dispatchers.IO) {
                     callBlock()
@@ -26,7 +26,7 @@ open class BaseViewModel : ViewModel() {
             } catch (e: Exception) {
                 errorBlock?.invoke(e)
             }
-            liveData?.postValue(false)
+            uiChangeLiveData?.postValue(false)
         }
     }
 

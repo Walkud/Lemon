@@ -17,6 +17,7 @@ abstract class BaseViewModelFragment<VM : BaseViewModel> : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        //页面销毁自动移除
         viewModel.showProgress.observe(viewLifecycleOwner) { isShow ->
             if (isShow) {
                 progressView.show()
@@ -25,6 +26,7 @@ abstract class BaseViewModelFragment<VM : BaseViewModel> : BaseFragment() {
             }
         }
 
+        //页面销毁自动移除
         viewModel.showToast.observe(viewLifecycleOwner) {
             showToast(it)
         }
