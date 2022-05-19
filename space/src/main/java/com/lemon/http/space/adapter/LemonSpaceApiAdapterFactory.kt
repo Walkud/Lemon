@@ -19,7 +19,7 @@ class LemonSpaceApiAdapterFactory : ApiAdapter.Factory() {
                 return LemonSpaceApiAdapter
             } else {
                 throw IllegalArgumentException(
-                    "LemonScope generic types must be defined!" +
+                    "LemonSpace generic types must be defined!" +
                             "for returnTypeName:$type"
                 )
             }
@@ -28,7 +28,7 @@ class LemonSpaceApiAdapterFactory : ApiAdapter.Factory() {
     }
 
     /**
-     * LemonScope Api 返回结果转换器
+     * LemonSpace Api 返回结果转换器
      */
     private object LemonSpaceApiAdapter : ApiAdapter {
         override fun adapt(block: () -> Any): Any {
@@ -41,7 +41,7 @@ class LemonSpaceApiAdapterFactory : ApiAdapter.Factory() {
             }
 
             throw IllegalArgumentException(
-                "LemonScope generic types must be defined!" +
+                "LemonSpace generic types must be defined!" +
                         "for ,returnTypeName:$type"
             )
         }
