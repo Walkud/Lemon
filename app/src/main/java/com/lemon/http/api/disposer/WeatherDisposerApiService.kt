@@ -4,6 +4,7 @@ import com.lemon.http.Api
 import com.lemon.http.ApiField
 import com.lemon.http.ApiPath
 import com.lemon.http.ApiUrl
+import com.lemon.http.annotations.WeatherApi
 import com.lemon.http.bean.WeatherResult
 import com.lemon.http.disposer.Disposer
 import com.lemon.http.request.HttpMethod
@@ -11,6 +12,7 @@ import com.lemon.http.request.HttpMethod
 /**
  * 中国气象天气预报 Api
  */
+@WeatherApi
 @ApiUrl("http://www.weather.com.cn/")
 interface WeatherDisposerApiService {
 

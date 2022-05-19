@@ -3,6 +3,7 @@ package com.lemon.http.net
 import com.lemon.http.space.adapter.LemonSpaceApiAdapterFactory
 import com.lemon.http.BuildConfig
 import com.lemon.http.Lemon
+import com.lemon.http.annotations.WeatherApi
 import com.lemon.http.api.TstApiService
 import com.lemon.http.api.WeatherApiService
 import com.lemon.http.api.disposer.TstDisposerApiService
@@ -31,7 +32,7 @@ object Net {
         //添加 Disposer 返回类型转换工厂
         addApiAdapterFactory(DisposerApiAdapterFactory())
         addApiAdapterFactory(LemonSpaceApiAdapterFactory())
-        //添加请求拦截器
+        // 搏天api 添加请求拦截器
         addInterceptor(object : Interceptor {
             override fun intercept(chain: Interceptor.Chain): Response {
                 Thread.sleep(1000)//模拟耗时1秒
@@ -40,6 +41,19 @@ object Net {
                     request.newBuilder()
                         .addHeader("X-CALL-ID", UUID.randomUUID().toString())
                         .build()
+                return chain.proceed(newRequest)
+            }
+        })
+        addInterceptor(object : Interceptor {
+            override fun intercept(chain: Interceptor.Chain): Response {
+                val request = chain.request()
+                //根据自定义Api判断额外添加请求头等参数，也可以根据 url 判断
+                val annotation = request.originService.getAnnotation(WeatherApi::class.java)
+                val newRequest = annotation?.let {
+                    request.newBuilder()
+                        .addHeader("X-TOKEN", UUID.randomUUID().toString())
+                        .build()
+                } ?: request
                 return chain.proceed(newRequest)
             }
         })
