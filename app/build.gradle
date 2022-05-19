@@ -41,7 +41,6 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':lemon')
-    implementation project(':disposer')
     implementation project(':space')
     debugImplementation project(':log')
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines"

@@ -2,7 +2,6 @@ package com.lemon.http
 
 import com.lemon.http.bean.ReqBody
 import com.lemon.http.client.LemonClient
-import com.lemon.http.disposer.adapter.DisposerApiAdapterFactory
 import com.lemon.http.interceptor.Interceptor
 import com.lemon.http.log.LemonLogInterceptor
 import com.lemon.http.log.LemonLogLevel
@@ -29,7 +28,6 @@ class KotlinUnitTest {
     private val lemon = Lemon.build {
         setApiUrl("http://localhost.charlesproxy.com:8080")
         addConverterFactory(GsonConverterFactory())
-        addApiAdapterFactory(DisposerApiAdapterFactory())
         addInterceptor(object : Interceptor {
             override fun intercept(chain: Interceptor.Chain): Response {
                 val request = chain.request()

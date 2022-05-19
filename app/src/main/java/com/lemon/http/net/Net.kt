@@ -6,12 +6,9 @@ import com.lemon.http.Lemon
 import com.lemon.http.annotations.WeatherApi
 import com.lemon.http.api.TstApiService
 import com.lemon.http.api.WeatherApiService
-import com.lemon.http.api.disposer.TstDisposerApiService
-import com.lemon.http.api.disposer.WeatherDisposerApiService
 import com.lemon.http.api.space.TstLemonSpaceApiService
 import com.lemon.http.api.space.WeatherLemonSpaceApiService
 import com.lemon.http.client.LemonClient
-import com.lemon.http.disposer.adapter.DisposerApiAdapterFactory
 import com.lemon.http.factory.GsonConverterFactory
 import com.lemon.http.interceptor.Interceptor
 import com.lemon.http.log.LemonLogInterceptor
@@ -29,8 +26,7 @@ object Net {
         setApiUrl("https://api.btstu.cn")
         //添加 Gson 转换工厂
         addConverterFactory(GsonConverterFactory())
-        //添加 Disposer 返回类型转换工厂
-        addApiAdapterFactory(DisposerApiAdapterFactory())
+        //添加 LemonSpace 返回类型转换工厂
         addApiAdapterFactory(LemonSpaceApiAdapterFactory())
         // 搏天api 添加请求拦截器
         addInterceptor(object : Interceptor {
@@ -70,10 +66,6 @@ object Net {
     fun getTstApiService() = lemon.create(TstApiService::class.java)
 
     fun getWeatherApiService() = lemon.create(WeatherApiService::class.java)
-
-    fun getTstDisposerApiService() = lemon.create(TstDisposerApiService::class.java)
-
-    fun getWeatherDisposerApiService() = lemon.create(WeatherDisposerApiService::class.java)
 
     fun getTstLemonSpaceApiService() = lemon.create(TstLemonSpaceApiService::class.java)
 

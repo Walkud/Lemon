@@ -2,5 +2,4 @@ rootProject.name = "Lemon"
 include ':app'
 include ':lemon'
 include ':log'
-include ':disposer'
 include ':space'
