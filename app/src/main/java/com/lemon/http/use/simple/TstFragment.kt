@@ -47,7 +47,6 @@ class TstFragment : BaseFragment(), CoroutineScope by MainScope() {
                     progressView.show()
                     binding.resultTv.text = try {
                         val result = withContext(Dispatchers.IO) {
-                            delay(3000)//模拟延迟
                             Net.getTstApiService().languageTranslation(text)
                         }
                         Gson().toJson(result)
