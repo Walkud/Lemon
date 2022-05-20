@@ -34,15 +34,15 @@ annotation class ApiUrl(
 
 
 /**
- * Api 注解，表示请求以 某种 HttpMethod 方式发起请求，默认为 POST 请求。
+ * Api 注解，表示请求以某种 HttpMethod 方式发起请求，默认为 POST 请求。
  *
  * @param value url 相对路径。
- * @param method Http 请求方式(如：GET、POST等)，忽略大小写，@see ApiMethod。
+ * @param method Http 请求方式(如：GET、POST等)，@see HttpMethod。
  * @param headers 请求头参数数组。
  * @param isMultipart 是否使用 multipart/form-data 方式提交数据。
  *
  * 示例：
- * @Api(value = "xxx/yyy",method = "POST",headers = ["X-CALL-ID:call123", "X-Token:token123456"],isMultipart = true)
+ * @Api(value = "xxx/yyy",method = HttpMethod.POST,headers = ["X-CALL-ID:call123", "X-Token:token123456"],isMultipart = true)
  *
  * 注意：value 值请尽量不要以 / 开头，因为可能会出现 "https://api.test.com//xxx/yyy" 情况。
  * headers 请确保请求头名称是否重复添加，如果重复添加后，相同的请求头名称对应的值会使用 ';' 进行拼接作合并处理。
