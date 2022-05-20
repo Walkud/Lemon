@@ -27,6 +27,8 @@ internal class ApiMethodParser(
     private val headersBuilder = com.lemon.http.request.Headers.Builder()
     private val parameterHandlers = mutableListOf<ParameterHandler<*>>()
     private var isMultipart = false
+    private var multiApiBody = false//是否使用多个 @ApiBody
+    private var hasApiField = false//是否使用 @ApiField
 
     init {
         //解析 Api 接口类注解
@@ -151,11 +153,40 @@ internal class ApiMethodParser(
 
             val parameterHandler = when (val annotation = annotations.first()) {
                 is ApiBody -> {
+                    if (isMultipart) {
+                        throw  IllegalArgumentException(
+                            "@ApiBody cannot be used in conjunction with the isMultipart attribute of the @Api!" +
+                                    "for method:${originMethod.referenceName()},typeName:$type"
+                        )
+                    }
+
+                    if (hasApiField) {
+                        throw  IllegalArgumentException(
+                            "@ApiBody cannot be used with an @ApiField!" +
+                                    "for method:${originMethod.referenceName()},typeName:$type"
+                        )
+                    }
+
+                    if (multiApiBody) {
+                        throw  IllegalArgumentException(
+                            "Only one @ApiBody can be used for a method!" +
+                                    "for method:${originMethod.referenceName()},typeName:$type"
+                        )
+                    }
+                    multiApiBody = true
                     val converter: Converter<*, RequestBody> =
                         lemon.converterFinder.findRequestBodyConverter(type, originMethod)
                     ParameterHandler.Body(index, originMethod, converter)
                 }
                 is ApiField -> {
+                    if (multiApiBody) {
+                        throw  IllegalArgumentException(
+                            "@ApiField cannot be used with an @ApiBody" +
+                                    "for method:${originMethod.referenceName()},typeName:$type"
+                        )
+                    }
+
+                    hasApiField = true
                     val name = annotation.value
                     val encoded = annotation.encoded
 
