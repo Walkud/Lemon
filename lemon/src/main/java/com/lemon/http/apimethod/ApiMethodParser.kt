@@ -116,6 +116,14 @@ internal class ApiMethodParser(
         this.relativePath = annotation.value
         this.httpMethod = annotation.method
         this.isMultipart = annotation.isMultipart
+
+        if (isMultipart && httpMethod != HttpMethod.POST) {
+            throw IllegalArgumentException(
+                "When @Api's isMultipart property is set to true, the httpMethod property must be POST!" +
+                        "for method:${originMethod.referenceName()}"
+            )
+        }
+
         val headers = annotation.headers
         for (header in headers) {
             val index = header.trim().indexOf(":")
@@ -181,7 +189,14 @@ internal class ApiMethodParser(
                 is ApiField -> {
                     if (multiApiBody) {
                         throw  IllegalArgumentException(
-                            "@ApiField cannot be used with an @ApiBody" +
+                            "@ApiField cannot be used with an @ApiBody!" +
+                                    "for method:${originMethod.referenceName()},typeName:$type"
+                        )
+                    }
+
+                    if (isMultipart) {
+                        throw  IllegalArgumentException(
+                            "@Api cannot use @ApiField when the isMultipart property is set to true, use @ApiPart instead!" +
                                     "for method:${originMethod.referenceName()},typeName:$type"
                         )
                     }
@@ -276,7 +291,14 @@ internal class ApiMethodParser(
                 is ApiPart -> {
                     if (!isMultipart) {
                         throw  IllegalArgumentException(
-                            "@ApiPart annotation must be used with the @Multipart annotation！" +
+                            "@ApiPart use you must set @Api's isMultipart property to true！" +
+                                    "for method:${originMethod.referenceName()},typeName:$type"
+                        )
+                    }
+
+                    if (multiApiBody) {
+                        throw  IllegalArgumentException(
+                            "The @ApiBody annotation cannot be used when the @Api isMultipart property is set to true！" +
                                     "for method:${originMethod.referenceName()},typeName:$type"
                         )
                     }

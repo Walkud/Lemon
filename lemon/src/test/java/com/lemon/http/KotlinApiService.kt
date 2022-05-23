@@ -18,8 +18,7 @@ interface KotlinApiService {
     @Api(
         value = "getServerTime",
         method = HttpMethod.GET,
-        headers = ["X-CALL-ID:call123", "X-Token:token123456"],
-        isMultipart = true
+        headers = ["X-CALL-ID:call123", "X-Token:token123456"]
     )
     fun getServerTime(): BaseResult<ServerTime>
 
