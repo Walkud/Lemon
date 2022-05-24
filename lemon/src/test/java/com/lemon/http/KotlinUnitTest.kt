@@ -28,17 +28,15 @@ class KotlinUnitTest {
     private val lemon = Lemon.build {
         setApiUrl("http://localhost.charlesproxy.com:8080")
         addConverterFactory(GsonConverterFactory())
-        addInterceptor(object : Interceptor {
-            override fun intercept(chain: Interceptor.Chain): Response {
-                val request = chain.request()
-                val newRequest =
-                    request.newBuilder()
-                        .addHeader("X-CALL-ID", UUID.randomUUID().toString())
-                        .build()
-                return chain.proceed(newRequest)
-            }
-        })
-        addInterceptor(LemonLogInterceptor(LemonLogLevel.BODY))
+        addInterceptor { chain ->
+            val request = chain.request()
+            val newRequest =
+                request.newBuilder()
+                    .addHeader("X-CALL-ID", UUID.randomUUID().toString())
+                    .build()
+            chain.proceed(newRequest)
+        }
+        addInterceptor(LemonLogInterceptor(LemonLogLevel.ALL))
         setHttpClient(
             LemonClient.Builder().setReadTimeout(30 * 1000).setConnectTimeout(30 * 1000).build()
         )

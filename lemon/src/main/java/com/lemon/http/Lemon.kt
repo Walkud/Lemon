@@ -9,6 +9,7 @@ import com.lemon.http.interceptor.Interceptor
 import com.lemon.http.apimethod.ApiMethodFactory
 import com.lemon.http.converter.ConverterFinder
 import com.lemon.http.interceptor.RealCallInterceptor
+import com.lemon.http.request.Response
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
@@ -81,6 +82,17 @@ class Lemon private constructor(
          */
         fun addConverterFactory(converter: Converter.Factory) =
             apply { converterFactors.add(converter) }
+
+        /**
+         * 添加请求拦截器
+         */
+        fun addInterceptor(block: (chain: Interceptor.Chain) -> Response): Interceptor {
+            return object : Interceptor {
+                override fun intercept(chain: Interceptor.Chain): Response {
+                    return block(chain)
+                }
+            }
+        }
 
         /**
          * 添加请求拦截器
