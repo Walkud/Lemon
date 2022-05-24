@@ -83,11 +83,15 @@ fun postBody(@ApiBody reqBody: ReqBody): BaseResult<Void>
 
 #### 定义接口函数时使用 @Api headers 属性
 
+适用于单个接口添加固定请求头参数。
+
 ```
 @Api(……，headers = ["X-CALL-ID:call123", "X-Token:token123456"])
 ```
 
 #### 定义接口函数参数时 使用 @ApiHeader 注解
+
+适用于单个接口添加动态请求头参数。
 
 ```
 @Api("post/query")
@@ -100,6 +104,8 @@ fun postQuery(
 
 #### 通过自定义拦截器重新构建 Request
 
+适用于为所有接口添加公共请求头参数。
+
 ```
 addInterceptor { chain ->
 	val request = chain.request()
@@ -109,8 +115,6 @@ addInterceptor { chain ->
 		.build()
 	chain.proceed(newRequest)
 ```
-
-为所有接口添加公共参数推荐使用拦截器方式。
 
 ### 请求动态 Path
 
@@ -160,9 +164,31 @@ fun postBody(@ApiBody reqBody: ReqBody): BaseResult<Void>
 
 KotlinApiService 下所有的接口函数执行都会以 'https://xxx.xxx.xxx/' 去先拼接 'lemon/'，再去拼接@Api Path 'post/body'，示例中最终实际的 ApiUrl 为 'https://xxx.xxx.xxx/lemon/post/body'。
 
-### 添加日志拦截器
+### 拦截器
 
-#### 默认日志拦截器
+#### 自定义拦截器
+
+```
+Lemon.build {
+       ……
+       addInterceptor { chain ->
+		val request = chain.request()
+		//添加公共请求头参数
+		val newRequest =
+			request.newBuilder()
+			.addHeader("X-CALL-ID", UUID.randomUUID().toString())
+			.build()
+		//加密请求参数(待补充示例)
+		chain.proceed(newRequest)
+        }
+       ……
+        )
+    }
+```
+
+#### 日志拦截器
+
+日志拦截器是自定义拦截器的一种，默认提供。
 
 ```
 addInterceptor(LemonLogInterceptor(LemonLogLevel.BODY))
@@ -181,5 +207,63 @@ addInterceptor(LemonLogInterceptor(LemonLogLevel.BODY))
 * ALL
 	* 带请求头、消息体、声明接口类及函数方法日志
 
-**注意：线上环境请移除该拦截器(建议)或将拦截器日志等级设置为 LemonLogLevel.NONE ，否则会可能会泄漏请求数据。**
-	
+**注意：线上环境请移除该拦截器(建议)或将拦截器日志等级设置为 LemonLogLevel.NONE ，否则会可能会泄漏请求数据。**	
+### LemonSpace
+
+LemonSpace 是普通网络请求场景的简单封装类，可以用于 UI 生命周期绑定、UI 进度切换、自动切换 UI 与 IO 线程。
+
+如果你未使用官方提供的 ViewModel 方式，则可以使用 LemonSpace。
+
+```
+//第一步，初始化 Lemon 实例时添加 LemonSpace 返回类型转换工厂
+Lemon.build {
+	……
+	addApiAdapterFactory(LemonSpaceApiAdapterFactory())
+	……
+}
+
+//第二步，定义接口时函数方法返回值 LemonSpace<T>
+interface TstLemonSpaceApiService {
+    @Api("tst/api.php")
+    fun languageTranslation(@ApiField("text") text: String): LemonSpace<TstResult>
+}
+
+///第三步，发起调用并添加 UI 生命周期绑定和进度控制
+Net.getTstLemonSpaceApiService().languageTranslation(text)//发起接口调用，返回 LemonSpace 实例
+	.bindLifecycle(viewLifecycleOwner, Lifecycle.Event.ON_DESTROY)//绑定 UI 生命周期
+	.doStart { progressView.show() } //开始时显示进度 UI
+	.doEnd { progressView.dismiss() }//结束时隐藏进度 UI
+	.doError {binding.resultTv.text = "语言翻译异常：${it.message}"} //监听异常错误
+	.request {binding.resultTv.text = Gson().toJson(it)}//发起实际请求调用并监听结果回调
+```
+
+LemonSpace 内部会控制 IO 与 UI 线程的调度，请求调用会在 IO 线程中执行，doStart、doEnd、request 回调会在 UI 线程中执行。
+
+#### 进一步封装
+
+可以对绑定 UI 生命周期和进度控制逻辑进一步封装，添加扩展文件 LemonSpaceExt.kt 和 ProgressView UI 控制接口(请参考 app 示例代码)
+
+```
+fun <T> LemonSpace<T>.bindUi(
+    progressView: ProgressView,
+    owner: LifecycleOwner,
+    event: Lifecycle.Event = Lifecycle.Event.ON_DESTROY
+): LemonSpace<T> {
+    return bindLifecycle(owner, event)//绑定 UI 生命周期
+        .doStart { progressView.show() } //开始时显示进度 UI
+        .doEnd { progressView.dismiss() } //结束时隐藏进度 UI
+}
+```
+
+可以进一步简化实际调用方式，最终调用方式如下：
+
+```
+Net.getTstLemonSpaceApiService().languageTranslation(text)
+                .bindUi(progressView, viewLifecycleOwner)//UI 生命周期绑定和进度控制
+                .doError {binding.resultTv.text = "语言翻译异常：${it.message}"}//异常错误处理
+                .request {binding.resultTv.text = Gson().toJson(it)}//处理正常回调
+```
+
+
+
+
