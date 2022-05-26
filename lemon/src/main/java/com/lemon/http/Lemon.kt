@@ -86,13 +86,12 @@ class Lemon private constructor(
         /**
          * 添加请求拦截器
          */
-        fun addInterceptor(block: (chain: Interceptor.Chain) -> Response): Interceptor {
-            return object : Interceptor {
+        fun addInterceptor(block: (chain: Interceptor.Chain) -> Response) =
+            addInterceptor(object : Interceptor {
                 override fun intercept(chain: Interceptor.Chain): Response {
                     return block(chain)
                 }
-            }
-        }
+            })
 
         /**
          * 添加请求拦截器

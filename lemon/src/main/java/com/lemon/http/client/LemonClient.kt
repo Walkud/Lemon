@@ -14,6 +14,7 @@ import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.Proxy
+import java.net.SocketTimeoutException
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLSocketFactory
@@ -32,12 +33,8 @@ class LemonClient private constructor(
 ) : HttpClient {
 
     override fun execute(request: Request): Response {
-        try {
-            val finalRequest = HttpClient.addDefaultHeaders(request)
-            return call(finalRequest)
-        } catch (e: MalformedURLException) {
-            throw HttpException.create("Url is not absolute:${request.url}", e)
-        }
+        val finalRequest = HttpClient.addDefaultHeaders(request)
+        return call(finalRequest)
     }
 
     override fun readTimeout() = readTimeout
@@ -59,39 +56,47 @@ class LemonClient private constructor(
 
             addHeaderPropertys(connection, request)
 
+            try {
+                connection.connect()
+            } catch (e: Exception) {
+                throw HttpException.connect(request.url, e)
+            }
+
             if (request.hasBody()) {
                 request.body?.let {
-                    val contentLength = it.contentLength()
-                    if (contentLength == -1L) {
-                        //Body 长度未知，采用默认分块大小传输
-                        connection.setChunkedStreamingMode(0)
-                    } else {
-                        //设置 Body 已知长度
-                        connection.setFixedLengthStreamingMode(contentLength)
-                    }
-
-                    ops = connection.outputStream.apply {
-                        it.writeTo(this)
-                        flush()
+                    try {
+                        ops = connection.outputStream.apply {
+                            it.writeTo(this)
+                            flush()
+                        }
+                    } catch (e: IOException) {
+                        throw HttpException.write(request.url, e)
                     }
                 }
             }
 
-            connection.connect()
+            val code = try {
+                connection.responseCode
+            } catch (e: IOException) {
+                throw HttpException.code(-1, request.url)
+            }
 
-            val code = connection.responseCode
             val headers = parseResponseHeaders(connection)
             var body: ResponseBody? = null
-            inps = connection.inputStream
 
             if (code in 200..299) {
                 body = if (code in 204..205) {
                     ResponseBody.EMPTY_BODY
                 } else {
-                    ResponseBody.create(
-                        connection.inputStream.readBytes(),
-                        headers.getContentType()
-                    )
+                    try {
+                        inps = connection.inputStream
+                        ResponseBody.create(
+                            connection.inputStream.readBytes(),
+                            headers.getContentType()
+                        )
+                    } catch (e: IOException) {
+                        throw HttpException.read(request.url, e)
+                    }
                 }
             }
 
@@ -101,10 +106,14 @@ class LemonClient private constructor(
                 .setHeaders(headers)
                 .setBody(body)
                 .build()
-        } catch (e: IOException) {
-            throw HttpException.create("Execute request exception to ${request.url}", e)
+        } catch (e: SocketTimeoutException) {
+            throw HttpException.timeOut(request.url, e)
+        } catch (e: MalformedURLException) {
+            throw HttpException.urlParse(request.url, e)
         } catch (e: HttpException) {
             throw e
+        } catch (e: Exception) {
+            throw HttpException.unknown(request.url, e)
         } finally {
             inps?.tryClose()
             ops?.tryClose()
@@ -113,7 +122,7 @@ class LemonClient private constructor(
     }
 
     /**
-     * 创建 HttpURLConnection 连接
+     * 创建 HttpURLConnection 连接并设置相关配置
      */
     private fun openConnection(request: Request): HttpURLConnection {
         val url = request.url.toURL()
@@ -121,19 +130,33 @@ class LemonClient private constructor(
         val connection = try {
             if (proxy() != null) url.openConnection(proxy()) else url.openConnection()
         } catch (e: IOException) {
-            throw HttpException.create("Unable to open connection to ${request.url}", e)
+            throw HttpException.openConnect(request.url, e)
         } as HttpURLConnection
 
-        connection.readTimeout = readTimeout()
-        connection.connectTimeout = connectTimeout()
+        val hasBody = request.hasBody()
+        connection.readTimeout = readTimeout()//设置读取超时时间
+        connection.connectTimeout = connectTimeout()//设置连接超时时间
         connection.useCaches = false //不允许缓存
-        connection.requestMethod = request.httpMethod.name
+        connection.requestMethod = request.httpMethod.name //设置 Http 请求方式
         connection.doInput = true
-        connection.doOutput = request.hasBody()
+        connection.doOutput = hasBody
 
         if (connection is HttpsURLConnection) {
             connection.sslSocketFactory = sslSocketFactory
             connection.hostnameVerifier = hostnameVerifier
+        }
+
+        if (hasBody) {
+            request.body?.let {
+                val contentLength = it.contentLength()
+                if (contentLength == -1L) {
+                    //Body 长度未知，采用默认分块大小传输
+                    connection.setChunkedStreamingMode(0)
+                } else {
+                    //设置 Body 已知长度
+                    connection.setFixedLengthStreamingMode(contentLength)
+                }
+            }
         }
 
         return connection

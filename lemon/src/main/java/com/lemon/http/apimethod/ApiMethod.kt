@@ -47,6 +47,6 @@ internal class ApiMethod(
             )
         }
 
-        throw HttpException.create(response)
+        throw HttpException.code(response.code, response.request.url)
     }
 }

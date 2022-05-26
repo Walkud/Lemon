@@ -164,7 +164,9 @@ fun postBody(@ApiBody reqBody: ReqBody): BaseResult<Void>
 
 KotlinApiService 下所有的接口函数执行都会以 'https://xxx.xxx.xxx/' 去先拼接 'lemon/'，再去拼接@Api Path 'post/body'，示例中最终实际的 ApiUrl 为 'https://xxx.xxx.xxx/lemon/post/body'。
 
-### 拦截器
+### 拦截器 ( Interceptor )
+
+拦截器可以用于添加公共请求参数头，参数加密、参数签名、日志打印等。
 
 #### 自定义拦截器
 
@@ -182,7 +184,6 @@ Lemon.build {
 		chain.proceed(newRequest)
         }
        ……
-        )
     }
 ```
 
@@ -207,7 +208,51 @@ addInterceptor(LemonLogInterceptor(LemonLogLevel.BODY))
 * ALL
 	* 带请求头、消息体、声明接口类及函数方法日志
 
-**注意：线上环境请移除该拦截器(建议)或将拦截器日志等级设置为 LemonLogLevel.NONE ，否则会可能会泄漏请求数据。**	
+**注意：线上环境请移除该拦截器(建议)或将拦截器日志等级设置为 LemonLogLevel.NONE ，否则会可能会泄漏请求数据。**
+
+### 序列化转换器 ( Converter )
+
+序列化转换器是用于将服务端与客户端的数据结构在传输与接收时转换成约定的类型。序列化转换器添加后作用于全局，会根据数据类型判断进行转换。
+
+```
+Lemon.build {
+	……
+	addConverterFactory(GsonConverterFactory())      
+	……
+}
+
+// 自定义 Gson 序列化转换器示例
+class GsonConverterFactory(private val gson: Gson = Gson()) : Converter.Factory {
+
+	override fun requestBodyConverter(type: Type, method: Method): Converter<*, RequestBody> {
+		return RequestBodyConverter(gson, type)
+	}
+
+	override fun responseBodyConverter(type: Type, method: Method): Converter<ResponseBody, *> {
+		return ResponseBodyConverter(gson, type)
+	}
+
+    /**
+     * 请求消息体 Gson 转换器
+     */
+	private class RequestBodyConverter(private val gson: Gson, private val type: Type) : Converter<Any, RequestBody> {
+		override fun convert(value: Any) = RequestBody.create(gson.toJson(value, type), ContentType.JSON)
+	}
+
+    /**
+     * 响应消息体 Gson 转换器
+     */
+	private class ResponseBodyConverter(private val gson: Gson, private val type: Type) :Converter<ResponseBody, Any> {
+		override fun convert(value: ResponseBody): Any {
+			val charset = value.contentType()?.getCharset() ?: Charsets.UTF_8
+			return gson.fromJson(String(value.byteArray(), charset), type)
+        }
+    }
+}
+```
+添加 Gson 序列化转换器后，请求的 @ApiBody 参数或服务端响应数据会优先去执行内置的序列化转换器 ( BuildInConverterFactory )，如果未匹配到对应的类型，则会执行  Gson 序列化转换器，对数据进行 json 转换。
+
+	
 ### LemonSpace
 
 LemonSpace 是普通网络请求场景的简单封装类，可以用于 UI 生命周期绑定、UI 进度切换、自动切换 UI 与 IO 线程。
@@ -262,6 +307,53 @@ Net.getTstLemonSpaceApiService().languageTranslation(text)
                 .bindUi(progressView, viewLifecycleOwner)//UI 生命周期绑定和进度控制
                 .doError {binding.resultTv.text = "语言翻译异常：${it.message}"}//异常错误处理
                 .request {binding.resultTv.text = Gson().toJson(it)}//处理正常回调
+```
+
+### 异常处理
+Lemon 内部对请求异常进行分类处理，统一封装成 HttpException，如果需要对异常类型做对应处理，则可以使用 HttpException 中的 state 属性进行判断。
+
+**注意：** 接口定义注解和函数方法解析异常并未进行封装，因为这属于错误定义，开发时请根据异常提示进行处理。
+
+#### 异常状态 (State)
+
+```
+enum class State {
+        /**
+         *  Http 响应 Code 异常状态，例如重定向、客服端参数错误、服务端异常都会归为此类状态
+         *  使用 LemonClient 时 code 码为 -1 则表示读取 responseCode 异常
+         */
+        CODE,
+
+        /**
+         * Url 解析异常状态，例如不规范的请求 Url 归为此类异常
+         */
+        URL_PARSE,
+
+        /**
+         * 连接异常状态，例如服务端未启动,未知的地址发生的连接异常归为此类状态
+         */
+        CONNECT,
+
+        /**
+         * 写异常状态，例如 outputStream 写入时发生的 IO 异常归为此类状态
+         */
+        WRITE,
+
+        /**
+         * 读异常状态，例如 inputStream 读时发生的 IO 异常归为此类状态
+         */
+        READ,
+
+        /**
+         * 超时异常状态，例如：连接超时，读取超时异常归为此类状态
+         */
+        TIME_OUT,
+
+        /**
+         * 未知异常状态，例如：代码 Bug 引起的异常或未处理的异常归为此类状态
+         */
+        Unknown
+    }
 ```
 
 
