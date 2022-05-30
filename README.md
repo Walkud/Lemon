@@ -29,7 +29,7 @@ Lemon 可用于 SDK 网络请求库，如果你习惯使用注解形式接口的
 //第一步：初始化 Lemon
 private val lemon = Lemon.build {
     //(必选)设置 ApiBaseUrl
-    setApiUrl("https://api.test.com”)
+    setApiUrl("https://api.test.com")
     //(可选)添加转换工厂
     addConverterFactory(……)
     //(可选)添加请求拦截器
