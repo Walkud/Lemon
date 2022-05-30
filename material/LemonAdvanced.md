@@ -357,5 +357,9 @@ enum class State {
 ```
 
 
+### 测试
+
+Lemon 库模块下有简单的单元测试代码，可以自行验证，简单的服务端代码见 server_test.zip (项目根目录/material/server/) 压缩包中，可自行下载并运行。
+
 
 
