@@ -21,20 +21,6 @@ Lemon 可用于 SDK 网络请求库，如果你习惯使用注解形式接口的
 * 暂不支持文件下载
 * 不支持 TRACE 请求方式，存在风险
 
-### 实现的原因
-个人认为接口注解形式是客户端对服务端接口最好的一种表达方式，所以参考了 Retorfit 和 Okhttp。以前的开发中一直使用 Retrofit + Okhttp + RxJava，中途开发 SDK 时也使用相同的技术栈，觉得整个使 SDK 太重且容易与应用依赖的版本冲突，但 SDK 又觉得简单对 HttpURLConnection 进行封装太简陋（强迫症+完美主义），找了一圈，未找到一款轻量、接口注解形式且使用 HttpURLConnection 的网络库，索性自己造轮子，这就是 Lemon 产生的原因。
-
-有人会疑惑，Retorfit + OkHttp 已经非常完美了，性能也比 HttpURLConnection 强，已经成为了 Android 开发标配，同时现在 Android 也没落了，为啥还要造一个轮子。首先我也认为 Retorfit 最佳搭配，不管是使用上还是内部代码解耦都非常牛逼，因为我太喜欢 Retorfit 所以通过站在巨人的肩膀上学习，正好在开发 SDK 中遇到了一些疑问，正好立个目标，参考 Retorfit 重新使用 Kotlin 实现一下，动手还是比较重要的；其次 Android 早在 Kitkat 4.4 (Api Level 19) 版本源码中就已经添加了 OkHttp，可以查看源码 ，但手上已经没有该系统版本的手机了，无法印证，但使用 Android 10 手机通过断网发起请求后，根据抛出的异常栈信息判断底层确实使用的是 OkHttp 的 HttpEngine，只是依赖的 OkHttp2 ，且支持能力有限(源码注释来看只支持Http/1.1， 而 SPDY 和 Http/2.0 被禁用了)。
-
-[HttpURLConnection 与 OkHttp 调用栈](./material/OkHttpRelation.md)
-
-### 学到了什么
-* 重新认识了 Retrofit 和 OkHttp
-* 对 Http 进一步认识，对 Multipart 数据结构有了更清晰的认识
-* 对部分开发模式有了进一步的了解。
-* 对 HttpURLConnection 使用有了进一步的了解。
-* 对 Kotlin 协程有了全新的认识，直接影响我对 RxJava 的依赖。
-
 # 说明文档
 
 ### 简单使用
@@ -83,6 +69,20 @@ val result = apiService.submitContent("Hello Lemon")
 ### 原理说明及高级用法
 
 [传送门](./material/LemonAdvanced.md)
+
+### 实现的原因
+个人认为接口注解形式是客户端对服务端接口最好的一种表达方式，所以参考了 Retorfit 和 Okhttp。以前的开发中一直使用 Retrofit + Okhttp + RxJava，中途开发 SDK 时也使用相同的技术栈，觉得整个使 SDK 太重且容易与应用依赖的版本冲突，但 SDK 又觉得简单对 HttpURLConnection 进行封装太简陋（强迫症+完美主义），找了一圈，未找到一款轻量、接口注解形式且使用 HttpURLConnection 的网络库，索性自己造轮子，这就是 Lemon 产生的原因。
+
+有人会疑惑，Retorfit + OkHttp 已经非常完美了，性能也比 HttpURLConnection 强，已经成为了 Android 开发标配，同时现在 Android 也没以前火了，为啥还要造一个轮子。首先我也认为 Retorfit 最佳搭配，不管是使用上还是内部代码解耦都非常牛逼，因为我太喜欢 Retorfit 所以通过站在巨人的肩膀上学习，学习不能看到什么火就学什么，反而应该持续深耕，正好在开发 SDK 中遇到了一些疑问，正好立个目标，参考 Retorfit 重新使用 Kotlin 实现一下，动手还是比较重要的；其次 Android 早在 Kitkat 4.4 (Api Level 19) 版本源码中就已经添加了 OkHttp，可以查看源码 ，但手上已经没有该系统版本的手机了，无法印证，但使用 Android 10 手机通过断网发起请求后，根据抛出的异常栈信息判断底层确实使用的是 OkHttp 的 HttpEngine，只是依赖的 OkHttp2 ，且支持能力有限(源码注释来看只支持Http/1.1， 而 SPDY 和 Http/2.0 被禁用了)。
+
+[HttpURLConnection 与 OkHttp 调用栈](./material/OkHttpRelation.md)
+
+### 学到了什么
+* 重新认识了 Retrofit 和 OkHttp
+* 对 Http 进一步认识，对 Multipart 数据结构有了更清晰的认识
+* 对部分开发模式有了进一步的了解。
+* 对 HttpURLConnection 使用有了进一步的了解。
+* 对 Kotlin 协程有了全新的认识，直接影响我对 RxJava 的依赖。
 
 # TODO
 
