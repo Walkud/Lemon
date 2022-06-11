@@ -1,5 +1,5 @@
 rootProject.name = "Lemon"
-include ':app'
+//include ':app'
 include ':lemon'
 include ':log'
 include ':space'
