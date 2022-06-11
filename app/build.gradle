@@ -5,7 +5,7 @@ android {
     compileSdkVersion 30
 
     defaultConfig {
-        applicationId "com.lemon.http"
+        applicationId "com.lemon.app"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
@@ -41,8 +41,8 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':lemon')
-    implementation project(':space')
-    debugImplementation project(':log')
+    implementation project(':lemonLog')
+    implementation project(':lemonSpace')
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines"
 
     implementation 'androidx.core:core-ktx:1.6.0'

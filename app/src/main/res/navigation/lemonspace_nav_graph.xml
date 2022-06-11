@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.lemon.http.use.space.TstLemonSpaceFragment"
+        android:name="com.lemon.app.use.space.TstLemonSpaceFragment"
         android:label="LemonSpace 语言翻译"
         tools:layout="@layout/fragment_tst">
 
@@ -17,7 +17,7 @@
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="com.lemon.http.use.space.WeatherLemonSpaceFragment"
+        android:name="com.lemon.app.use.space.WeatherLemonSpaceFragment"
         android:label="LemonSpace 城市天气预报"
         tools:layout="@layout/fragment_weather">
 

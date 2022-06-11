@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.lemon.http.use.viewmodel.TstViewModelFragment"
+        android:name="com.lemon.app.use.viewmodel.TstViewModelFragment"
         android:label="ViewModel 语言翻译"
         tools:layout="@layout/fragment_tst">
 
@@ -17,7 +17,7 @@
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="com.lemon.http.use.viewmodel.WeatherViewModelFragment"
+        android:name="com.lemon.app.use.viewmodel.WeatherViewModelFragment"
         android:label="ViewModel 城市天气预报"
         tools:layout="@layout/fragment_weather">
 
