@@ -1,5 +1,8 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'maven-publish'
+}
 
 android {
     compileSdkVersion 30
@@ -28,10 +31,35 @@ android {
     }
 }
 
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                // Applies the component for the release build variant.
+                from components.release
+
+                // You can then customize attributes of the publication as shown below.
+                groupId = 'com.lemon.http'
+                artifactId = 'lemon'
+                version = '1.0.0'
+            }
+            // Creates a Maven publication called “debug”.
+//            debug(MavenPublication) {
+//                // Applies the component for the debug build variant.
+//                from components.debug
+//
+//                groupId = 'com.lemon.http'
+//                artifactId = 'lemon-debug'
+//                version = '1.0.0'
+//            }
+        }
+    }
+}
+
 dependencies {
 
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-//    compileOnly 'androidx.core:core-ktx:1.7.0'
     compileOnly 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1'
     testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
