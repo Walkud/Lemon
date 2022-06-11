@@ -11,15 +11,6 @@ afterEvaluate {
                 artifactId = ARTIFACT_ID
                 version = PUB_VERSION
             }
-            // Creates a Maven publication called “debug”.
-//            debug(MavenPublication) {
-//                // Applies the component for the debug build variant.
-//                from components.debug
-//
-//                groupId = 'com.lemon.http'
-//                artifactId = 'lemon-debug'
-//                version = '1.0.0'
-//            }
         }
     }
 }
