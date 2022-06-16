@@ -1,6 +1,7 @@
 package com.lemon.core.client
 
 import com.lemon.core.LemonUtils
+import com.lemon.core.getHeaderHost
 import com.lemon.core.request.Headers
 import com.lemon.core.request.Request
 import com.lemon.core.request.Response
@@ -54,7 +55,7 @@ interface HttpClient {
             val host = headers.get(Headers.HOST_KEY)
             if (host == null) {
                 val url = request.url.toURL()
-                newBuilder.setHeader(Headers.HOST_KEY, "${url.host}:${url.port}")
+                newBuilder.setHeader(Headers.HOST_KEY, url.getHeaderHost())
             }
 
             val connection = headers.get(Headers.CONNECTION_KEY)

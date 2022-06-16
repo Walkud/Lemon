@@ -45,6 +45,19 @@ internal fun String.appendPath(vararg urlPath: String): String {
 internal fun String.toURL() = URL(this)
 
 /**
+ * 根据 URL 获取 Host 值
+ */
+internal fun URL.getHeaderHost(): String {
+    var portStr = ""
+    if ("http" == protocol && port != -1 && port != 80) {
+        portStr = ":$port"
+    } else if ("https" == protocol && port != -1 && port != 443) {
+        portStr = ":$port"
+    }
+    return "$host$portStr"
+}
+
+/**
  * 检测是否为默认方法
  */
 internal fun Method.checkDefault() =
