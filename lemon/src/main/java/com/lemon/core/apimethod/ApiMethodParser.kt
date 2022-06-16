@@ -5,6 +5,7 @@ import com.lemon.core.apimethod.parameter.ParameterHandler
 import com.lemon.core.converter.Converter
 import com.lemon.core.request.HttpMethod
 import com.lemon.core.request.Request
+import com.lemon.core.request.RequestFactory
 import com.lemon.core.request.body.RequestBody
 import java.lang.reflect.Method
 
@@ -44,24 +45,22 @@ internal class ApiMethodParser(
      */
     fun buildRequest(args: Array<Any?>): Request {
 
-        val reuqestBuilder =
-            Request.Builder(
+        val requestFactory = RequestFactory(
                 originService,
                 originMethod,
                 lemon.apiUrl,
                 httpMethod,
                 apiUrl,
                 relativePath,
-                headersBuilder,
-                isMultipart,
+                headersBuilder
             )
 
         val handlers = parameterHandlers as MutableList<ParameterHandler<Any>>
         for (i in handlers.indices) {
-            handlers[i].apply(reuqestBuilder, args[i])
+            handlers[i].apply(requestFactory, args[i])
         }
 
-        return reuqestBuilder.build()
+        return requestFactory.build()
     }
 
     /**
@@ -299,6 +298,13 @@ internal class ApiMethodParser(
                     if (multiApiBody) {
                         throw  IllegalArgumentException(
                             "The @ApiBody annotation cannot be used when the @Api isMultipart property is set to true！" +
+                                    "for method:${originMethod.referenceName()},typeName:$type"
+                        )
+                    }
+
+                    if(hasApiField){
+                        throw  IllegalArgumentException(
+                            "@ApiPart cannot be used with an @ApiField!" +
                                     "for method:${originMethod.referenceName()},typeName:$type"
                         )
                     }

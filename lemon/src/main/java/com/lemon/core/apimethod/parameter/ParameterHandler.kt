@@ -2,7 +2,7 @@ package com.lemon.core.apimethod.parameter
 
 import com.lemon.core.LemonUtils
 import com.lemon.core.converter.Converter
-import com.lemon.core.request.Request
+import com.lemon.core.request.RequestFactory
 import com.lemon.core.request.body.RequestBody
 import java.io.IOException
 import java.lang.reflect.Method
@@ -14,7 +14,7 @@ import java.lang.reflect.Method
  */
 internal interface ParameterHandler<in T> {
 
-    fun apply(builder: Request.Builder, value: T?)
+    fun apply(requestFactory: RequestFactory, value: T?)
 
     /**
      * 处理 @ApiBody 注解实体类
@@ -26,10 +26,10 @@ internal interface ParameterHandler<in T> {
     ) :
         ParameterHandler<T> {
 
-        override fun apply(builder: Request.Builder, value: T?) {
+        override fun apply(requestFactory: RequestFactory, value: T?) {
             if (value != null) {
                 try {
-                    builder.setBody(converter.convert(value))
+                    requestFactory.setBody(converter.convert(value))
                 } catch (e: IOException) {
                     LemonUtils.parameterError(
                         index,
@@ -57,9 +57,9 @@ internal interface ParameterHandler<in T> {
         private val encoded: Boolean
     ) : ParameterHandler<Any> {
 
-        override fun apply(builder: Request.Builder, value: Any?) {
+        override fun apply(requestFactory: RequestFactory, value: Any?) {
             value?.let {
-                builder.addFormField(name, it.toString(), encoded)
+                requestFactory.addFormField(name, it.toString(), encoded)
             }
         }
     }
@@ -73,13 +73,13 @@ internal interface ParameterHandler<in T> {
         private val encoded: Boolean
     ) : ParameterHandler<Map<String, Any?>> {
 
-        override fun apply(builder: Request.Builder, value: Map<String, Any?>?) {
+        override fun apply(requestFactory: RequestFactory, value: Map<String, Any?>?) {
             if (value != null) {
                 for (entry in value.entries) {
                     val name = entry.key
                     val feildValue = entry.value
                     if (feildValue != null) {
-                        builder.addFormField(name, feildValue.toString(), encoded)
+                        requestFactory.addFormField(name, feildValue.toString(), encoded)
                     } else {
                         LemonUtils.parameterError(
                             index,
@@ -102,9 +102,9 @@ internal interface ParameterHandler<in T> {
         private val method: Method,
         private val name: String,
     ) : ParameterHandler<Any> {
-        override fun apply(builder: Request.Builder, value: Any?) {
+        override fun apply(requestFactory: RequestFactory, value: Any?) {
             value?.let {
-                builder.addHeader(name, it.toString())
+                requestFactory.addHeader(name, it.toString())
             }
         }
     }
@@ -116,13 +116,13 @@ internal interface ParameterHandler<in T> {
         private val index: Int,
         private val method: Method,
     ) : ParameterHandler<Map<String, Any?>> {
-        override fun apply(builder: Request.Builder, value: Map<String, Any?>?) {
+        override fun apply(requestFactory: RequestFactory, value: Map<String, Any?>?) {
             if (value != null) {
                 for (entry in value.entries) {
                     val name = entry.key
                     val feildValue = entry.value
                     if (feildValue != null) {
-                        builder.addHeader(name, feildValue.toString())
+                        requestFactory.addHeader(name, feildValue.toString())
                     } else {
                         LemonUtils.parameterError(
                             index,
@@ -146,13 +146,13 @@ internal interface ParameterHandler<in T> {
         private val name: String,
         private val encoded: Boolean
     ) : ParameterHandler<Any> {
-        override fun apply(builder: Request.Builder, value: Any?) {
+        override fun apply(requestFactory: RequestFactory, value: Any?) {
             val path = value ?: LemonUtils.parameterError(
                 index,
                 method,
                 "Path $name value must not be null!"
             )
-            builder.addPathParam(name, path.toString(), encoded)
+            requestFactory.addPathParam(name, path.toString(), encoded)
         }
     }
 
@@ -165,9 +165,9 @@ internal interface ParameterHandler<in T> {
         private val name: String,
         private val encoding: String
     ) : ParameterHandler<Any> {
-        override fun apply(builder: Request.Builder, value: Any?) {
+        override fun apply(requestFactory: RequestFactory, value: Any?) {
             value?.let { part ->
-                builder.addPart(name, encoding, part)
+                requestFactory.addPart(name, encoding, part)
             }
         }
     }
@@ -180,13 +180,13 @@ internal interface ParameterHandler<in T> {
         private val method: Method,
         private val encoding: String
     ) : ParameterHandler<Map<String, Any?>> {
-        override fun apply(builder: Request.Builder, value: Map<String, Any?>?) {
+        override fun apply(requestFactory: RequestFactory, value: Map<String, Any?>?) {
             if (value != null) {
                 for (entry in value.entries) {
                     val name = entry.key
                     val partValue = entry.value
                     partValue?.let { part ->
-                        builder.addPart(name, encoding, part)
+                        requestFactory.addPart(name, encoding, part)
                     }
                 }
             } else {

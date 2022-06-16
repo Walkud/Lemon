@@ -70,6 +70,4 @@ enum class HttpMethod {
             else -> false
         }
     }
-
-
 }
