@@ -9,7 +9,7 @@ afterEvaluate {
                 // You can then customize attributes of the publication as shown below.
                 groupId = GROUP_ID
                 artifactId = ARTIFACT_ID
-                version = PUB_VERSION
+                version = VERSION_NAME
             }
         }
     }
