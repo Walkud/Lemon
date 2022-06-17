@@ -105,15 +105,14 @@ class RequestFactory constructor(
     }
 
     fun build(): Request {
-
         var relativeUrl = when {
-            relativePath.isHttpProtocol() -> {
+            relativePath.isHttpProtocol() -> {//如果 method path 为绝对 url，则直接使用
                 relativePath
             }
-            serviceUrlPath.isHttpProtocol() -> {
+            serviceUrlPath.isHttpProtocol() -> {//如果 ApiUrl 指定的 path 为绝对 url,则直接与 method path 后返回
                 serviceUrlPath.appendPath(relativePath)
             }
-            else -> {
+            else -> {//否则直接拼接 apiUrl + serviceUrlPath + relativePath
                 apiUrl.appendPath(serviceUrlPath, relativePath)
             }
         }
