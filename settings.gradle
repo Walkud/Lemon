@@ -1,5 +1,5 @@
 rootProject.name = "Lemon"
 include ':app'
-include ':lemon'
-include ':lemonLog'
-include ':lemonSpace'
+include ':core'
+include ':log'
+include ':space'
