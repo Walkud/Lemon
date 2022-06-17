@@ -101,17 +101,7 @@ class RequestFactory constructor(
      */
     private fun appendQueryParams(relativeUrl: String, formBuilder: FormBody.Builder): String {
         val query = formBuilder.build().convertToQuery()
-        return when (relativeUrl.indexOf("?")) {
-            -1 -> {//未找到问号
-                "$relativeUrl?$query"
-            }
-            relativeUrl.lastIndex -> {//问号在最后一个字符
-                "$relativeUrl$query"
-            }
-            else -> {//问号后还有其它参数
-                "$relativeUrl&$query"
-            }
-        }
+        return relativeUrl.appendQueryParams(query)
     }
 
     fun build(): Request {

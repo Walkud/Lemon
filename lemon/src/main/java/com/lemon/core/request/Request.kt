@@ -1,5 +1,7 @@
 package com.lemon.core.request
 
+import com.lemon.core.appendQueryParams
+import com.lemon.core.appendQueryParamsEcode
 import com.lemon.core.isHttpProtocol
 import com.lemon.core.request.body.RequestBody
 import java.lang.reflect.Method
@@ -66,6 +68,20 @@ class Request private constructor(
          * 移除请求头参数
          */
         fun removeHeader(key: String) = apply { headersBuilder.remove(key) }
+
+        /**
+         * 追加 Url Get 请求参数并对 value 进行 UTF-8 UrlEncoder
+         */
+        fun appendQueryParamsEcode(name: String, value: String) = apply {
+            this.url = url.appendQueryParamsEcode(name, value)
+        }
+
+        /**
+         * 追加 Url Get 请求参数
+         */
+        fun appendQueryParams(name: String, value: String) = apply {
+            this.url = url.appendQueryParams(name, value)
+        }
 
         /**
          * 设置请求方式

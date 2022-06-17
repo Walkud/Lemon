@@ -36,6 +36,8 @@ object Net {
                 val newRequest =
                     request.newBuilder()
                         .addHeader("X-CALL-ID", UUID.randomUUID().toString())
+                        //对所有的url都追加个客户端时间的参数
+                        .appendQueryParams("clientTime", "${System.currentTimeMillis()}")
                         .build()
                 return chain.proceed(newRequest)
             }

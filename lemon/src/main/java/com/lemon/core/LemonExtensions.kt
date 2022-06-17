@@ -1,5 +1,6 @@
 package com.lemon.core
 
+import com.lemon.core.request.ContentType
 import com.lemon.core.request.body.FormBody
 import com.lemon.core.request.body.MultipartBody
 import java.io.*
@@ -9,6 +10,7 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.lang.reflect.WildcardType
 import java.net.URL
+import java.net.URLEncoder
 
 /**
  * Describe: 扩展文件
@@ -37,6 +39,37 @@ internal fun String.appendPath(vararg urlPath: String): String {
     }
 
     return pathSb.toString()
+}
+
+/**
+ * Url 追加参数并对 value 进行 UTF-8 UrlEncoder
+ */
+internal fun String.appendQueryParamsEcode(name: String, value: String): String {
+    return appendQueryParams("name=${URLEncoder.encode(value, Charsets.UTF_8.toString())}")
+}
+
+/**
+ *  Url 追加参数
+ */
+internal fun String.appendQueryParams(name: String, value: String): String {
+    return appendQueryParams("$name=$value")
+}
+
+/**
+ * Url 追加参数
+ */
+internal fun String.appendQueryParams(query: String): String {
+    return when (indexOf("?")) {
+        -1 -> {//未找到问号
+            "$this?$query"
+        }
+        lastIndex -> {//问号在最后一个字符
+            "$this$query"
+        }
+        else -> {//问号后还有其它参数
+            "$this&$query"
+        }
+    }
 }
 
 /**
