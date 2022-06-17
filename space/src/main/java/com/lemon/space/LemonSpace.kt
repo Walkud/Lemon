@@ -22,6 +22,7 @@ class LemonSpace<T> private constructor(
     private val lemonSpace = LemonScope()
     private var cancelled = false //是否已经取消，即 UI 页面是否已经销毁
     private var doStartBlocks: MutableList<() -> Unit> = mutableListOf() //开始回调函数集合
+    private var doCalls: MutableList<() -> Unit> = mutableListOf() //正常回调 Call 函数集合
     private var doErrorBlocks: MutableList<(e: Exception) -> Unit> = mutableListOf()//异常回调函数集合
     private var doEndBlocks: MutableList<(endState: EndState) -> Unit> = mutableListOf()//完成回调函数集合
     private var requestBlock: ((T) -> Unit)? = null //请求回调函数
@@ -32,6 +33,11 @@ class LemonSpace<T> private constructor(
      * 开始事件监听，可以用于进度弹框、开始与结束按钮状态转换场景，常与 doEnd 事件结合使用
      */
     fun doStart(block: () -> Unit) = apply { doStartBlocks.add(block) }
+
+    /**
+     * 正常回调 Call 监听，可以用于进度弹框、内容显示
+     */
+    fun doCall(block: () -> Unit) = apply { doCalls.add(block) }
 
     /**
      * 错误事件监听
@@ -82,6 +88,7 @@ class LemonSpace<T> private constructor(
                     apiBlock()
                 }
                 //回调结果
+                doCalls.forEach { it.invoke() }
                 requestBlock?.invoke(result)
             } catch (e: Exception) {
                 //触发异常事件
@@ -108,6 +115,7 @@ class LemonSpace<T> private constructor(
      */
     private fun clear() {
         doStartBlocks.clear()
+        doCalls.clear()
         doErrorBlocks.clear()
         doEndBlocks.clear()
         requestBlock = null

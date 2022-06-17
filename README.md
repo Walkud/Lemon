@@ -23,6 +23,20 @@ Lemon 可用于 SDK 网络请求库，如果你习惯使用注解形式接口的
 
 # 说明文档
 
+### 依赖
+
+```
+//核心(必选)
+implementation 'com.github.Walkud.Lemon:core:0.1.1'
+
+//日志输出(可选)
+implementation 'com.github.Walkud.Lemon:log:0.1.1'
+//LemonSpace(可选)
+implementation 'com.github.Walkud.Lemon:space:0.1.1'
+
+
+```
+
 ### 简单使用
 
 ```
