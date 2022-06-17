@@ -84,15 +84,12 @@ val result = apiService.submitContent("Hello Lemon")
 * 对 HttpURLConnection 使用有了进一步的了解。
 * 对 Kotlin 协程有了全新的认识，直接影响我对 RxJava 的依赖。
 
-# TODO
-
-* 默认支持 Gzip 压缩
-* Cookie 管理
-* 请求缓存
-* 支持类似 Chuck 功能，便于手机本地查看请求日志
-
 # 时间线
 整个过程中对细节进行打磨。
+
+* 2022-06-16
+    * 修复请求头 Host 构建 Bug
+    * 优化 Request 数据结构
 
 * 2022-05-19 
 	* 添加 LemonSpace 协程方式简易封装，可用于 UI 生命周期绑定、UI 进度切换、自动切换 UI 与 IO 线程场景
