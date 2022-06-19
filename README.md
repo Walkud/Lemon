@@ -37,6 +37,8 @@ implementation 'com.github.Walkud.Lemon:space:0.1.1'
 
 ```
 
+2022 年 6 月已使用该库替换掉 [JudyKotlinMvp](https://github.com/Walkud/JudyKotlinMvp) 仿猫眼的实际项目中的 RxJava + Retrofit + OkHttp。
+
 ### 简单使用
 
 ```
