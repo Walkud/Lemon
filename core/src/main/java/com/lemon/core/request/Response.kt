@@ -18,11 +18,17 @@ class Response private constructor(
      */
     fun isSuccess() = code in 200..299
 
-    class Builder {
-        private var request: Request? = null
-        private var code = -1
-        private var headers: Headers? = null
-        private var body: ResponseBody? = null
+    /**
+     * 构建新 Response Builder
+     */
+    fun newBuilder() = Builder(request, code, headers, body)
+
+    class Builder(
+        var request: Request,
+        var code: Int,
+        var headers: Headers,
+        var body: ResponseBody? = null
+    ) {
 
         fun setRequest(request: Request) = apply { this.request = request }
 
@@ -30,17 +36,13 @@ class Response private constructor(
 
         fun setHeaders(headers: Headers) = apply { this.headers = headers }
 
-        fun setBody(body: ResponseBody?) = apply { this.body = body }
+        fun setBody(body: ResponseBody) = apply { this.body = body }
 
         fun build(): Response {
-            val finalRequest = request
-                ?: throw IllegalArgumentException("Response builder error: request is null!")
             val finalCode =
                 if (code >= 0) code else throw IllegalArgumentException("Response builder error: code < 0 (code:$code) !")
-            val finalHeaders = headers ?: Headers.Builder().build()
             val finalBody = body ?: ResponseBody.EMPTY_BODY
-
-            return Response(finalRequest, finalCode, finalHeaders, finalBody)
+            return Response(request, finalCode, headers, finalBody)
         }
 
     }

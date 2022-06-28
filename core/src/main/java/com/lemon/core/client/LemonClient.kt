@@ -100,11 +100,7 @@ class LemonClient private constructor(
                 }
             }
 
-            return Response.Builder()
-                .setRequest(request)
-                .setCode(code)
-                .setHeaders(headers)
-                .setBody(body)
+            return Response.Builder(request, code, headers, body)
                 .build()
         } catch (e: SocketTimeoutException) {
             throw HttpException.timeOut(request.url, e)
