@@ -11,10 +11,14 @@ import com.lemon.app.api.space.WeatherLemonSpaceApiService
 import com.lemon.core.client.LemonClient
 import com.lemon.app.factory.GsonConverterFactory
 import com.lemon.core.interceptor.Interceptor
+import com.lemon.core.request.ContentType
 import com.lemon.log.LemonLogInterceptor
 import com.lemon.log.LemonLogLevel
 import com.lemon.core.request.Response
+import com.lemon.core.request.body.ResponseBody
+import java.io.InputStream
 import java.util.*
+import java.util.zip.GZIPInputStream
 
 /**
  * Lemon 实例构建类
@@ -42,6 +46,7 @@ object Net {
                 return chain.proceed(newRequest)
             }
         })
+        //添加根据 Api 添加额外请求头拦截器
         addInterceptor(object : Interceptor {
             override fun intercept(chain: Interceptor.Chain): Response {
                 val request = chain.request()
@@ -55,6 +60,8 @@ object Net {
                 return chain.proceed(newRequest)
             }
         })
+        addInterceptor(Interceptor.createGzipInterceptor())
+
         if (BuildConfig.DEBUG) {
             //添加日志打印拦截器
             addInterceptor(LemonLogInterceptor(LemonLogLevel.BODY))

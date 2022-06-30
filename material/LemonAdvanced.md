@@ -210,6 +210,20 @@ addInterceptor(LemonLogInterceptor(LemonLogLevel.BODY))
 
 **注意：线上环境请移除该拦截器(建议)或将拦截器日志等级设置为 LemonLogLevel.NONE ，否则会可能会泄漏请求数据。**
 
+#### Gzip 拦截器
+
+Gzip 拦截器是 Lemon 提供的对服务端 Gzip 压缩返回数据进行自动解压的一个拦截器，可根据需求自行添加。
+
+```
+//具体添加方法
+Lemon.build {
+       ……
+       addInterceptor(Interceptor.createGzipInterceptor())
+       ……
+    }
+```
+
+
 ### 序列化转换器 ( Converter )
 
 序列化转换器是用于将服务端与客户端的数据结构在传输与接收时转换成约定的类型。序列化转换器添加后作用于全局，会根据数据类型判断进行转换。

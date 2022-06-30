@@ -19,9 +19,22 @@ class Response private constructor(
     fun isSuccess() = code in 200..299
 
     /**
+     * 获取头参数
+     */
+    fun getHeader(key: String) = headers.getFirst(key)
+
+    /**
      * 构建新 Response Builder
      */
     fun newBuilder() = Builder(request, code, headers, body)
+
+    /**
+     * 是否存在 Body 数据
+     */
+    fun hasBodyData(): Boolean {
+        return body.contentLength() > 0
+                || "chunked".equals(getHeader("Transfer-Encoding"), ignoreCase = true)
+    }
 
     class Builder(
         var request: Request,

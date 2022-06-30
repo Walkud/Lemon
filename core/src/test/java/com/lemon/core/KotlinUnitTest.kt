@@ -2,10 +2,13 @@ package com.lemon.core
 
 import com.lemon.core.bean.ReqBody
 import com.lemon.core.client.LemonClient
+import com.lemon.core.interceptor.Interceptor
+import com.lemon.core.request.Response
 import com.lemon.log.LemonLogInterceptor
 import com.lemon.log.LemonLogLevel
 import com.lemon.core.request.body.MultipartBody
 import com.lemon.core.request.body.RequestBody
+import com.lemon.core.request.body.ResponseBody
 import kotlinx.coroutines.*
 import org.junit.Test
 import java.io.File
@@ -35,6 +38,7 @@ class KotlinUnitTest {
             chain.proceed(newRequest)
         }
         addInterceptor(LemonLogInterceptor(LemonLogLevel.ALL))
+        addInterceptor(Interceptor.createGzipInterceptor())
         setHttpClient(
             LemonClient.Builder().setReadTimeout(30 * 1000).setConnectTimeout(30 * 1000).build()
         )
@@ -165,6 +169,24 @@ class KotlinUnitTest {
             println("postPartBody code:${result.code},msg:${result.msg}")
         } catch (t: Throwable) {
             t.printStackTrace()
+        }
+    }
+
+    @Test
+    fun queryGzipData() {
+        val httpService = lemon.create<KotlinApiService>()
+        val result = httpService.queryGzipData()
+        if (result.isSuccess()) {
+            val sb = StringBuilder()
+            for (datum in result.data) {
+                if (sb.isNotEmpty()) {
+                    sb.append(",")
+                }
+                sb.append(datum.id)
+            }
+            println("Item ids:$sb")
+        } else {
+            println("ServerMsg Fail! ServerMsg:${result.msg}")
         }
     }
 

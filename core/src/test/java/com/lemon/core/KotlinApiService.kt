@@ -54,4 +54,7 @@ interface KotlinApiService {
         @ApiPart("contentRequestBody") contentRequestBody: RequestBody,
         @ApiPart partMap: Map<String, Any>
     ): BaseResult<Void>
+
+    @Api("post/queryGzipData")
+    fun queryGzipData(): BaseResult<List<Item>>
 }

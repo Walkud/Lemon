@@ -1,6 +1,7 @@
 package com.lemon.core.request.body
 
 import com.lemon.core.request.ContentType
+import java.util.zip.GZIPInputStream
 
 /**
  * Describe: 请求响应消息体
@@ -22,6 +23,15 @@ abstract class ResponseBody {
                     return content.size.toLong()
                 }
             }
+        }
+
+        /**
+         * 创建 Gzip 解压 ResponseBody
+         */
+        fun createGzip(content: ByteArray, contentType: ContentType? = null): ResponseBody {
+            val gzipInputStream = GZIPInputStream(content.inputStream())
+            val unGzipContent = gzipInputStream.readBytes()
+            return create(unGzipContent, contentType)
         }
     }
 

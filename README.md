@@ -13,6 +13,7 @@ Lemon 可用于 SDK 网络请求库，如果你习惯使用注解形式接口的
 * 支持自定义请求拦截器、序列化转换器、返回类型适配器，默认提供日志拦截器
 * 支持自定义请求 Client 客户端，默认提供 LemonClient（使用HttpURLConnection）, LemonClient 支持自定义 SSL，默认不校验证书
 * 默认支持同步调用，线程调度建议使用协程控制，也可以使用 LemonSpace 封装类进行线程调度、生命周期管理、进度显示控制
+* 支持 Gzip 自动解压，可根据需求自行添加。
 
 ### 不支持
 * 不支持取消执行中的请求
@@ -103,10 +104,11 @@ val result = apiService.submitContent("Hello Lemon")
 # 时间线
 整个过程中对细节进行打磨。
 
+* 2022-06-30
+	* 添加 Gzip 自动解压支持
 * 2022-06-16
-    * 修复请求头 Host 构建 Bug
-    * 优化 Request 数据结构
-
+   * 修复请求头 Host 构建 Bug
+   * 优化 Request 数据结构
 * 2022-05-19 
 	* 添加 LemonSpace 协程方式简易封装，可用于 UI 生命周期绑定、UI 进度切换、自动切换 UI 与 IO 线程场景
 	* 移除 Disposer 模块

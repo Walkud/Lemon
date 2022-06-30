@@ -16,6 +16,9 @@ class Headers private constructor(
         const val CONNECTION_KEY = "Connection"
         const val CONTENT_LENGTH_KEY = "Content-Length"
         const val TRANSFER_ENCODING_KEY = "Transfer-Encoding"
+        const val ACCEPT_ENCODING = "Accept-Encoding"
+        const val RANGE = "Range"
+        const val CONTENT_ENCODING = "Content-Encoding"
     }
 
     /**

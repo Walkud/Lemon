@@ -24,6 +24,11 @@ class Request private constructor(
      */
     fun hasBody() = httpMethod.hasBody()
 
+    /**
+     * 获取头参数
+     */
+    fun getHeader(key: String) = headers.getFirst(key)
+
     fun newBuilder(): Builder {
         return Builder(
             originService,
