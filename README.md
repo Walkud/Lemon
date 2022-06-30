@@ -28,12 +28,12 @@ Lemon 可用于 SDK 网络请求库，如果你习惯使用注解形式接口的
 
 ```
 //核心(必选)
-implementation 'com.github.Walkud.Lemon:core:0.1.1'
+implementation 'com.github.Walkud.Lemon:core:0.1.3'
 
 //日志输出(可选)
-implementation 'com.github.Walkud.Lemon:log:0.1.1'
+implementation 'com.github.Walkud.Lemon:log:0.1.3'
 //LemonSpace(可选)
-implementation 'com.github.Walkud.Lemon:space:0.1.1'
+implementation 'com.github.Walkud.Lemon:space:0.1.3'
 
 
 ```
@@ -64,7 +64,7 @@ interface ApiService {
 //第三步：创建 ApiService 动态代理类, xxx 为 Api 接口定义类
 val apiService = lemon.create<ApiService>()
 
-//第四步：发起请求(异步执行)
+//第四步：发起请求(请在异步线程中执行)
 val result = apiService.submitContent("Hello Lemon")
 ```
 
