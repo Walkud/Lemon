@@ -106,6 +106,7 @@ val result = apiService.submitContent("Hello Lemon")
 
 * 2022-06-30
 	* 添加 Gzip 自动解压支持
+	* 优化请求头忽略大小写
 * 2022-06-16
    * 修复请求头 Host 构建 Bug
    * 优化 Request 数据结构

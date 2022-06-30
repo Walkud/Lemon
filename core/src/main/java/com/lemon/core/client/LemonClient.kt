@@ -174,8 +174,16 @@ class LemonClient private constructor(
     private fun parseResponseHeaders(
         httpConection: HttpURLConnection
     ): Headers {
-        val headersFields = httpConection.headerFields ?: mapOf<String, List<String>>()
-        return Headers.Builder().set(headersFields).build()
+        val hdeaders = mutableMapOf<String, List<String>>()
+        //这里处理 HttpURLConnection 请求头参数，防止返回 Key 和 Value 返回为空的情况
+        httpConection.headerFields?.let {
+            for (mutableEntry in it) {
+                mutableEntry.key?.let { key ->
+                    hdeaders[key] = mutableEntry.value ?: listOf()
+                }
+            }
+        }
+        return Headers.Builder().set(hdeaders).build()
     }
 
     class Builder {
