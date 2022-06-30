@@ -81,7 +81,7 @@ val result = apiService.submitContent("Hello Lemon")
 
 ```
 
-详细接口定义注解说明请参考 LemonAnnotation.kt 文件。[传送门](./lemon/src/main/java/com/lemon/http/LemonAnnotation.kt)
+详细接口定义注解说明请参考 LemonAnnotation.kt 文件。[传送门](./lemon/src/main/java/com/lemon/core/LemonAnnotation.kt)
 
 ### 原理说明及高级用法
 
