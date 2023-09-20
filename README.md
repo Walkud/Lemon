@@ -28,12 +28,12 @@ Lemon 可用于 SDK 网络请求库，如果你习惯使用注解形式接口的
 
 ```
 //核心(必选)
-implementation 'com.github.Walkud.Lemon:core:0.1.3'
+implementation 'com.github.Walkud.Lemon:core:0.1.4'
 
 //日志输出(可选)
-implementation 'com.github.Walkud.Lemon:log:0.1.3'
+implementation 'com.github.Walkud.Lemon:log:0.1.4'
 //LemonSpace(可选)
-implementation 'com.github.Walkud.Lemon:space:0.1.3'
+implementation 'com.github.Walkud.Lemon:space:0.1.4'
 
 
 ```
@@ -104,6 +104,8 @@ val result = apiService.submitContent("Hello Lemon")
 # 时间线
 整个过程中对细节进行打磨。
 
+* 2023-09-20
+	* 修改 SDK 支持的最小版本号，并统一模块的 SDK 版本配置
 * 2022-06-30
 	* 添加 Gzip 自动解压支持
 	* 优化请求头忽略大小写
