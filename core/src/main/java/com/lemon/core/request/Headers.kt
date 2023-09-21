@@ -140,6 +140,11 @@ class Headers private constructor(
             }
         }
 
+        /**
+         * 复制请求头 Builder
+         */
+        fun copy() = Builder().also { it.headerMap.putAll(headerMap) }
+
         fun build(): Headers {
             var contentType = ContentType.DEFAULT
 

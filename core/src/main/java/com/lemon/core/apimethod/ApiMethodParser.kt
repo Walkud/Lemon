@@ -3,6 +3,7 @@ package com.lemon.core.apimethod
 import com.lemon.core.*
 import com.lemon.core.apimethod.parameter.ParameterHandler
 import com.lemon.core.converter.Converter
+import com.lemon.core.request.Headers
 import com.lemon.core.request.HttpMethod
 import com.lemon.core.request.Request
 import com.lemon.core.request.RequestFactory
@@ -25,7 +26,7 @@ internal class ApiMethodParser(
     private var apiUrl = ""
     private var relativePath = ""
     private var httpMethod = HttpMethod.POST //默认使用 POST
-    private val headersBuilder = com.lemon.core.request.Headers.Builder()
+    private val headersBuilder = Headers.Builder()
     private val parameterHandlers = mutableListOf<ParameterHandler<*>>()
     private var isMultipart = false
     private var multiApiBody = false//是否使用多个 @ApiBody
@@ -52,7 +53,7 @@ internal class ApiMethodParser(
                 httpMethod,
                 apiUrl,
                 relativePath,
-                headersBuilder
+                headersBuilder.copy()
             )
 
         val handlers = parameterHandlers as MutableList<ParameterHandler<Any>>

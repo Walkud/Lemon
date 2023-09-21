@@ -9,6 +9,7 @@ import com.lemon.log.LemonLogLevel
 import com.lemon.core.request.body.MultipartBody
 import com.lemon.core.request.body.RequestBody
 import com.lemon.core.request.body.ResponseBody
+import com.lemon.log.BuildConfig
 import kotlinx.coroutines.*
 import org.junit.Test
 import java.io.File
@@ -104,6 +105,16 @@ class KotlinUnitTest {
         try {
             val httpService = lemon.create<KotlinApiService>()
             val callTime = System.currentTimeMillis()
+            //验证连续发送请求
+           val test =  httpService.postQuery(
+                callTime,
+                mapOf(
+                    "X-SDK-VERSION-NAME" to BuildConfig.VERSION_NAME,
+                    "X-SDK-VERSION-CODE" to BuildConfig.VERSION_CODE,
+                ),
+                mapOf("type" to "testType", "page" to 1, "pageSize" to 10)
+            )
+
             val result = httpService.postQuery(
                 callTime,
                 mapOf(
@@ -112,6 +123,7 @@ class KotlinUnitTest {
                 ),
                 mapOf("type" to "testType", "page" to 1, "pageSize" to 10)
             )
+
             if (result.isSuccess()) {
                 val sb = StringBuilder()
                 for (datum in result.data) {
