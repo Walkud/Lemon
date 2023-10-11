@@ -28,12 +28,12 @@ Lemon 可用于 SDK 网络请求库，如果你习惯使用注解形式接口的
 
 ```
 //核心(必选)
-implementation 'com.github.Walkud.Lemon:core:0.1.4'
+implementation 'com.github.Walkud.Lemon:core:0.1.6'
 
 //日志输出(可选)
-implementation 'com.github.Walkud.Lemon:log:0.1.4'
+implementation 'com.github.Walkud.Lemon:log:0.1.6'
 //LemonSpace(可选)
-implementation 'com.github.Walkud.Lemon:space:0.1.4'
+implementation 'com.github.Walkud.Lemon:space:0.1.6'
 
 
 ```
@@ -104,6 +104,8 @@ val result = apiService.submitContent("Hello Lemon")
 # 时间线
 整个过程中对细节进行打磨。
 
+* 2023-10-11
+	* 添加 LemonSpace 同步请求返回
 * 2023-09-21
 	* 修复方法动态添加请求头多次调用出现多个请求头 Bug
 * 2023-09-20

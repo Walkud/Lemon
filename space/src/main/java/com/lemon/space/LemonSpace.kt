@@ -72,7 +72,12 @@ class LemonSpace<T> private constructor(
     }
 
     /**
-     * 发起请求
+     * 发起请求，同步返回
+     */
+    fun request() = apiBlock()
+
+    /**
+     * 发起请求，异步返回
      */
     fun request(block: (T) -> Unit) {
         requestBlock = block
